@@ -18,16 +18,7 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # ── Enum types ────────────────────────────────────────────────────────────
-    op.execute("CREATE TYPE userrole AS ENUM ('investor', 'rm', 'compliance')")
-    op.execute("CREATE TYPE riskprofile AS ENUM ('conservative', 'moderate', 'moderately_aggressive', 'aggressive')")
-    op.execute("CREATE TYPE taxregime AS ENUM ('old', 'new')")
-    op.execute("CREATE TYPE assetclass AS ENUM ('equity', 'debt', 'gold', 'international', 'cash', 'real_estate', 'crypto')")
-    op.execute("CREATE TYPE goaltype AS ENUM ('retirement', 'home_purchase', 'child_education', 'emergency_fund', 'vacation', 'wealth_creation', 'other')")
-    op.execute("CREATE TYPE transactiontype AS ENUM ('sip', 'lumpsum_buy', 'redemption', 'switch_in', 'switch_out', 'dividend')")
-    op.execute("CREATE TYPE alerttype AS ENUM ('CONCENTRATION_RISK', 'CRYPTO_OVERWEIGHT', 'NO_NOMINEE', 'KYC_EXPIRED', 'ESTATE_GAP', 'REVIEW_OVERDUE', 'NPS_NOT_OPENED', 'FD_OVERWEIGHT', 'AI_LOW_CONFIDENCE')")
-    op.execute("CREATE TYPE alertpriority AS ENUM ('critical', 'high', 'medium', 'low')")
-    op.execute("CREATE TYPE compliancedoctype AS ENUM ('sebi_disclosure', 'risk_profile', 'suitability_attestation', 'kyc_record', 'meeting_summary')")
+    # Enum types are created automatically by SQLAlchemy when create_table runs.
 
     # ── clients (create before users — users FK → clients) ────────────────────
     op.create_table(

@@ -16,11 +16,11 @@ class Settings(BaseSettings):
 
     APP_NAME: str = "AI Wealth Manager"
     APP_ENV: str = "development"
-    APP_VERSION: str = "1.0.0"
+    APP_VERSION: str = "0.4.0"
     DEBUG: bool = True
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
 
-    DATABASE_URL: str = "postgresql+asyncpg://wm_user:wm_password@localhost:5432/wealth_manager"
+    DATABASE_URL: str = "postgresql+asyncpg://wm_user:wm_password@localhost:5433/wealth_manager"
     DATABASE_POOL_SIZE: int = 10
     DATABASE_MAX_OVERFLOW: int = 20
     DATABASE_ECHO: bool = False

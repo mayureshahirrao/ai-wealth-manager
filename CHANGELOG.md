@@ -1,0 +1,108 @@
+# Changelog
+
+All notable changes to AI Wealth Manager are documented here.
+Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATCH`.
+
+> **Version policy:**
+> - `MAJOR` — breaking API/schema changes
+> - `MINOR` — new phase / significant feature set
+> - `PATCH` — bug fixes, dependency pins, config corrections
+
+---
+
+## [0.4.0] — 2026-05-29
+
+### Fixed — Windows compatibility & dependency stabilisation
+- **Migration idempotency** — removed explicit `CREATE TYPE` DDL from `001_initial_schema.py`; SQLAlchemy now owns enum creation via `create_table`, eliminating `DuplicateObjectError` on re-runs
+- **SQLAlchemy enum values** — added `_enum()` helper with `values_callable=lambda x: [e.value for e in x]` to all `SAEnum()` columns in `models.py`; fixes `InvalidTextRepresentationError: invalid input value for enum userrole: "RM"` caused by SQLAlchemy 2.x defaulting to `.name` over `.value`
+- **Port conflict** — changed Docker PostgreSQL host port from `5432` → `5433` in `docker-compose.yml` and `config.py` default to avoid collision with locally-installed PostgreSQL
+- **Dependency conflicts** — resolved `anthropic==0.39.0` vs `langchain-anthropic==0.3.3` incompatibility by relaxing to `anthropic>=0.41.0`; pinned `bcrypt==4.0.1` for `passlib==1.7.4` compatibility; added `email-validator==2.2.0` for Pydantic `EmailStr`; commented out `chromadb` and `sentence-transformers` (require C++ Build Tools, deferred to Phase 5)
+- **`.env` location** — documented that `backend/.env` is required (pydantic-settings resolves relative to CWD, not package root); config default updated to port 5433 as safe fallback
+
+### Changed
+- `backend/requirements.txt` — pinned `bcrypt==4.0.1`, added `email-validator==2.2.0`, relaxed `anthropic` pin, commented out ChromaDB/sentence-transformers
+- `backend/app/core/config.py` — `APP_VERSION` → `"0.4.0"`, `DATABASE_URL` default → port `5433`
+- `frontend/package.json` — `version` → `"0.4.0"`
+
+---
+
+## [0.3.0] — 2026-05-29
+
+### Added — Phase 3+4: Claude Integration, 5 AI Tools, SSE Streaming
+
+#### AI Infrastructure (`backend/app/ai/`)
+- `claude_client.py` — Singleton `AsyncAnthropic` wrapper with tenacity retry (3 attempts, exponential backoff on rate limit / API errors)
+- `base_tool.py` — Abstract `BaseTool` with automatic timing, SEBI audit logging (`log_ai_call`), and error wrapping to `AIToolExecutionError`
+- `tool_registry.py` — Per-request `ToolRegistry` with `dispatch()` + `get_schemas()`; `ToolNames` constants defining `INVESTOR_TOOLS` and `RM_TOOLS` subsets
+- `compliance_injector.py` — `QueryType` enum (PORTFOLIO / TAX / RETIREMENT / INVESTMENT_ADVICE / BEHAVIORAL / MARKET / GENERAL); `classify_query()`, `inject_disclaimer()` (appends SEBI disclaimer), `validate_response_compliance()` (prohibited phrase detection), `estimate_confidence()` (heuristic 0.0–0.95)
+- `langsmith_tracer.py` — `setup_langsmith()` configures env vars at startup; no-op when `LANGCHAIN_API_KEY` not set
+- `response_validator.py` — `ValidationResult` dataclass; plausibility checks for tax rates, XIRR bounds, retirement corpus range; `run_full_validation()` dispatcher
+- `streaming.py` — Agentic tool-use loop (max 5 iterations); SSE event protocol (`delta`, `tool_call`, `tool_result`, `done`, `error`); `build_investor_system_prompt()` and `build_rm_system_prompt()`
+
+#### 5 AI Tools (`backend/app/ai/tools/`)
+All tools are DB-injected per-request via `build_tool_registry(db)`:
+- `get_portfolio_summary` — AUM, XIRR vs benchmark, asset allocation %, top 5 holdings, active SIPs
+- `get_goal_progress` — `GoalAssessment` feasibility scores (0–100), shortfall analysis, recommendations per goal
+- `calculate_tax_liability` — Old/New regime comparison (Budget 2024), LTCG harvesting opportunity (₹1.25L annual exemption)
+- `get_market_data` — Nifty 50, Sensex, midcap/smallcap indices, RBI repo rate, G-Sec yield, MCX gold, USD/INR (demo data; Phase 5 → live NSE/BSE API)
+- `run_retirement_projection` — `assess_retirement_readiness()` with 6% inflation-adjusted targets, corpus gap analysis, additional SIP needed
+
+#### Chat Endpoint (`backend/app/api/chat.py`)
+- Full agentic SSE streaming replacing Phase 1 stub
+- Role-based tool selection: investors get 5 tools, RM gets 4 (no market data)
+- Investor access control: 403 if querying another client's `client_id`
+- Post-stream `finally` block persists `ChatMessage` (user + assistant) and `AIAuditLog` to DB even on client disconnect
+
+#### Other Backend
+- `main.py` — calls `setup_langsmith()` at startup
+- `auth/router.py GET /api/auth/me` — now returns `name` and `client_id`
+
+#### Frontend
+- `endpoints.js` — added `ME` namespace for all `/api/me/*` investor endpoints
+- `useApi.js` — `useMyPortfolio`, `useMyGoals`, `useMyTaxSummary`, `useMyNavHistory`, `useMyPerformance`, `useMyAlerts`, `useMyProfile` all call `/api/me/*` (no clientId required)
+
+---
+
+## [0.2.0] — 2026-05-28
+
+### Added — Phase 2: Financial Engine & Data Layer
+
+#### Financial Calculation Engine (`backend/app/financial/`)
+- `indian_constants.py` — Single source of truth: Budget 2024 tax rates, SEBI limits, SIP defaults, MF categories, LTCG/STCG rates, SEBI disclaimer text
+- `xirr.py` — Newton-Raphson XIRR with bisection fallback; handles irregular SIP cashflows
+- `currency_formatter.py` — `format_inr()` → "₹2.50 Cr", "₹45.00 L", "₹9,500"
+- `sip_calculator.py` — SIP future value, step-up SIP, lumpsum FV, required monthly SIP, inflation-adjusted value
+- `tax_calculator.py` — Old/New regime tax calculation, LTCG/STCG, `compare_tax_regimes()`, `ltcg_harvesting_opportunity()`
+- `goal_engine.py` — `GoalAssessment` dataclass (feasibility 0–100, status, recommendation); `assess_retirement_readiness()`
+
+#### Database & Migrations
+- `alembic/versions/001_initial_schema.py` — hand-written DDL: 11 tables, 9 PostgreSQL enum types
+- `seed_data.py` — 5 Indian demo personas; 24-month SIP history + lumpsum transactions for XIRR; 2 compliance alerts; 3 investor login accounts
+
+#### API Endpoints (enriched)
+- `GET /api/clients` — AUM, XIRR, active alerts count, days since last review
+- `GET /api/clients/{id}/goals` — with `GoalAssessment` feasibility scores
+- `GET /api/clients/{id}/tax-summary` — regime comparison + LTCG harvesting opportunity
+- `GET /api/me/*` — 7 investor self-service endpoints (portfolio, goals, tax-summary, nav-history, performance, profile, alerts)
+
+#### Auth
+- JWT payload now carries `client_id` for investor role
+- `CurrentUser` dataclass includes `client_id: Optional[uuid.UUID]`
+
+---
+
+## [0.1.0] — 2026-05-27
+
+### Added — Phase 1: Foundation Scaffold
+
+- `docker-compose.yml` — PostgreSQL 16, ChromaDB 0.5, FastAPI backend, React frontend services
+- Full FastAPI application skeleton: core config, exceptions, logging, error handlers
+- SQLAlchemy 2.0 async ORM models: User, Client, Portfolio, Holding, Goal, Transaction, Alert, ChatMessage, AIAuditLog, ComplianceDocument, NAVHistory
+- Alembic migration environment (async)
+- JWT auth: login endpoint, role-based access guard (investor / rm / compliance)
+- Stub API routers: clients, chat, rm, compliance, financial-plan, market
+- React 18 + Vite + Tailwind CSS frontend scaffold
+- Role-based page structure: investor dashboard, RM dashboard, compliance dashboard
+- Login page with demo account quick-fill buttons
+- `Makefile` — `make up`, `make migrate-seed`, `make backend`, `make frontend`, `make dev`

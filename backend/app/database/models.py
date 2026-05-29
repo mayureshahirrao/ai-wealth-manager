@@ -23,6 +23,11 @@ from app.database.base_model import (
 from sqlalchemy import Enum as SAEnum
 
 
+def _enum(enum_class):
+    """SQLAlchemy 2.x uses enum .name by default; force it to use .value instead."""
+    return SAEnum(enum_class, values_callable=lambda x: [e.value for e in x])
+
+
 # ─── Users ────────────────────────────────────────────────────────────────────
 
 class User(WealthBase):
@@ -30,7 +35,7 @@ class User(WealthBase):
 
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
-    role: Mapped[UserRole] = mapped_column(SAEnum(UserRole), nullable=False)
+    role: Mapped[UserRole] = mapped_column(_enum(UserRole), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     # Only set for investor role
@@ -54,10 +59,10 @@ class Client(WealthBase):
     age: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
     risk_profile: Mapped[RiskProfile] = mapped_column(
-        SAEnum(RiskProfile), default=RiskProfile.MODERATE, nullable=False
+        _enum(RiskProfile), default=RiskProfile.MODERATE, nullable=False
     )
     tax_regime: Mapped[TaxRegime] = mapped_column(
-        SAEnum(TaxRegime), default=TaxRegime.NEW, nullable=False
+        _enum(TaxRegime), default=TaxRegime.NEW, nullable=False
     )
     annual_income: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     rm_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
@@ -101,7 +106,7 @@ class Holding(WealthBase):
     scheme_name: Mapped[str] = mapped_column(String(200), nullable=False)
     isin: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     folio_number: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
-    asset_class: Mapped[AssetClass] = mapped_column(SAEnum(AssetClass), nullable=False)
+    asset_class: Mapped[AssetClass] = mapped_column(_enum(AssetClass), nullable=False)
     units: Mapped[float] = mapped_column(Float, nullable=False)
     nav: Mapped[float] = mapped_column(Float, nullable=False)
     invested_amount: Mapped[float] = mapped_column(Float, nullable=False)
@@ -135,7 +140,7 @@ class Goal(WealthBase):
         UUID(as_uuid=True), ForeignKey("clients.id"), nullable=False, index=True
     )
     goal_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    goal_type: Mapped[GoalType] = mapped_column(SAEnum(GoalType), nullable=False)
+    goal_type: Mapped[GoalType] = mapped_column(_enum(GoalType), nullable=False)
     target_amount: Mapped[float] = mapped_column(Float, nullable=False)
     current_corpus: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
     monthly_sip: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
@@ -154,7 +159,7 @@ class Transaction(WealthBase):
         UUID(as_uuid=True), ForeignKey("clients.id"), nullable=False, index=True
     )
     scheme_name: Mapped[str] = mapped_column(String(200), nullable=False)
-    transaction_type: Mapped[TransactionType] = mapped_column(SAEnum(TransactionType), nullable=False)
+    transaction_type: Mapped[TransactionType] = mapped_column(_enum(TransactionType), nullable=False)
     amount: Mapped[float] = mapped_column(Float, nullable=False)
     units: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     nav: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
@@ -171,8 +176,8 @@ class Alert(WealthBase):
     client_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("clients.id"), nullable=False, index=True
     )
-    alert_type: Mapped[AlertType] = mapped_column(SAEnum(AlertType), nullable=False)
-    priority: Mapped[AlertPriority] = mapped_column(SAEnum(AlertPriority), nullable=False)
+    alert_type: Mapped[AlertType] = mapped_column(_enum(AlertType), nullable=False)
+    priority: Mapped[AlertPriority] = mapped_column(_enum(AlertPriority), nullable=False)
     message: Mapped[str] = mapped_column(Text, nullable=False)
     is_resolved: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     resolved_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
@@ -223,7 +228,7 @@ class ComplianceDocument(WealthBase):
     client_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         UUID(as_uuid=True), ForeignKey("clients.id"), nullable=True, index=True
     )
-    doc_type: Mapped[ComplianceDocType] = mapped_column(SAEnum(ComplianceDocType), nullable=False)
+    doc_type: Mapped[ComplianceDocType] = mapped_column(_enum(ComplianceDocType), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     generated_by: Mapped[str] = mapped_column(String(50), default="ai", nullable=False)
     reviewed_by: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)

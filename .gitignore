@@ -1,0 +1,33 @@
+# Secrets
+.env
+*.pem
+
+# Word temp/lock files
+~$*
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+*.egg
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# DB / data
+*.db
+*.sqlite
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Logs
+*.log

@@ -75,11 +75,26 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)) -> AP
 
 
 @router.get("/me")
-async def get_me(current_user: CurrentUser = Depends(get_current_user)) -> APIResponse:
+async def get_me(
+    current_user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> APIResponse:
+    name = current_user.email.split("@")[0]
+
+    if current_user.client_id:
+        client_result = await db.execute(
+            select(Client).where(Client.id == current_user.client_id)
+        )
+        client = client_result.scalar_one_or_none()
+        if client:
+            name = client.name
+
     return success_response(
         data={
             "user_id": str(current_user.user_id),
             "email": current_user.email,
             "role": current_user.role.value,
+            "name": name,
+            "client_id": str(current_user.client_id) if current_user.client_id else None,
         }
     )

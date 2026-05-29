@@ -68,6 +68,7 @@ register_exception_handlers(app)
 
 from app.auth.router import router as auth_router
 from app.api.clients import router as clients_router
+from app.api.me import router as me_router
 from app.api.chat import router as chat_router
 from app.api.rm import router as rm_router
 from app.api.compliance import router as compliance_router
@@ -76,6 +77,7 @@ from app.api.market import router as market_router
 
 app.include_router(auth_router)
 app.include_router(clients_router)
+app.include_router(me_router)
 app.include_router(chat_router)
 app.include_router(rm_router)
 app.include_router(compliance_router)

@@ -16,10 +16,17 @@ security = HTTPBearer(auto_error=False)
 
 
 class CurrentUser:
-    def __init__(self, user_id: uuid.UUID, email: str, role: UserRole):
+    def __init__(
+        self,
+        user_id: uuid.UUID,
+        email: str,
+        role: UserRole,
+        client_id: Optional[uuid.UUID] = None,
+    ):
         self.user_id = user_id
         self.email = email
         self.role = role
+        self.client_id = client_id  # Set for investor role only
 
     @property
     def is_investor(self) -> bool:
@@ -40,10 +47,12 @@ async def get_current_user(
     if credentials is None:
         raise UnauthorizedException("No authentication token provided")
     payload = decode_access_token(credentials.credentials)
+    client_id_str = payload.get("client_id")
     return CurrentUser(
         user_id=uuid.UUID(payload["sub"]),
         email=payload["email"],
         role=UserRole(payload["role"]),
+        client_id=uuid.UUID(client_id_str) if client_id_str else None,
     )
 
 

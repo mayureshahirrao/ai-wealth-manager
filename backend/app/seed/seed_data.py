@@ -176,6 +176,53 @@ def _make_goals(client_id: uuid.UUID, client_age: int):
     ]
 
 
+def _make_transactions(client_id: uuid.UUID, multiplier: float = 1.0):
+    """24 months of monthly SIP transactions for XIRR computation."""
+    transactions = []
+    today = date.today()
+
+    holdings_config = [
+        ("Mirae Asset Large Cap Fund - Direct Growth", 15_000),
+        ("HDFC Short Duration Fund - Direct Growth", 10_000),
+    ]
+
+    import calendar
+
+    for month_offset in range(24, 0, -1):
+        m = today.month - month_offset
+        y = today.year + (m - 1) // 12
+        m = ((m - 1) % 12) + 1
+        last_day = calendar.monthrange(y, m)[1]
+        txn_date = date(y, m, min(5, last_day))  # SIP on 5th of each month
+
+        for scheme, sip_amount in holdings_config:
+            transactions.append({
+                "client_id": client_id,
+                "scheme_name": scheme,
+                "transaction_type": TransactionType.SIP,
+                "amount": sip_amount * multiplier,
+                "transaction_date": txn_date,
+            })
+
+    # Add initial lumpsum purchases (3 years ago)
+    lumpsum_date = date(today.year - 3, today.month, 1)
+    lumpsum_configs = [
+        ("Mirae Asset Large Cap Fund - Direct Growth", 300_000),
+        ("HDFC Short Duration Fund - Direct Growth", 500_000),
+        ("SBI Gold ETF", 700_000),
+    ]
+    for scheme, amount in lumpsum_configs:
+        transactions.append({
+            "client_id": client_id,
+            "scheme_name": scheme,
+            "transaction_type": TransactionType.LUMPSUM_BUY,
+            "amount": amount * multiplier,
+            "transaction_date": lumpsum_date,
+        })
+
+    return transactions
+
+
 def _make_nav_history(portfolio_id: uuid.UUID, base_value: float):
     history = []
     for i in range(24):
@@ -255,6 +302,10 @@ async def seed(session: AsyncSession) -> None:
         for nav in _make_nav_history(portfolio.id, portfolio.total_invested):
             session.add(NAVHistory(**nav))
 
+        # Transactions (SIP + lumpsum history for XIRR)
+        for txn in _make_transactions(client.id, multiplier):
+            session.add(Transaction(**txn))
+
     await session.flush()
 
     # ── Alerts ────────────────────────────────────────────────────────────────
@@ -277,7 +328,8 @@ async def seed(session: AsyncSession) -> None:
     ))
 
     await session.commit()
-    print(f"Seeded {len(CLIENTS)} clients, 2 staff users, alerts.")
+    total_txns = sum(len(_make_transactions(uuid.uuid4(), 1.0)) for _ in CLIENTS)
+    print(f"Seeded {len(CLIENTS)} clients, 2 staff users, alerts, ~{len(CLIENTS) * 51} transactions.")
 
 
 async def main():

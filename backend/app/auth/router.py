@@ -55,7 +55,12 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)) -> AP
             user_name = client.name
             client_id = str(user.client_id)
 
-    token = create_access_token(user_id=user.id, email=user.email, role=user.role)
+    token = create_access_token(
+        user_id=user.id,
+        email=user.email,
+        role=user.role,
+        client_id=user.client_id,
+    )
 
     logger.info("user_logged_in", email=user.email, role=user.role.value)
 

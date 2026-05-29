@@ -15,7 +15,12 @@ from app.database.base_model import UserRole
 settings = get_settings()
 
 
-def create_access_token(user_id: uuid.UUID, email: str, role: UserRole) -> str:
+def create_access_token(
+    user_id: uuid.UUID,
+    email: str,
+    role: UserRole,
+    client_id: Optional[uuid.UUID] = None,
+) -> str:
     expire = datetime.now(timezone.utc) + timedelta(
         minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES
     )
@@ -26,6 +31,8 @@ def create_access_token(user_id: uuid.UUID, email: str, role: UserRole) -> str:
         "exp": expire,
         "iat": datetime.now(timezone.utc),
     }
+    if client_id is not None:
+        payload["client_id"] = str(client_id)
     return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
 

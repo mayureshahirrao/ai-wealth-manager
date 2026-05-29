@@ -15,7 +15,18 @@ export const ENDPOINTS = {
     ME:    '/api/auth/me',
   },
 
-  // ── Client / Investor ─────────────────────────────────────────────────────
+  // ── Investor Self-Service (authenticated investor calls own data) ─────────
+  ME: {
+    PORTFOLIO:         '/api/me/portfolio',
+    GOALS:             '/api/me/goals',
+    TAX_SUMMARY:       '/api/me/tax-summary',
+    NAV_HISTORY:       '/api/me/nav-history',
+    PERFORMANCE:       '/api/me/performance',
+    PROFILE:           '/api/me/profile',
+    ALERTS:            '/api/me/alerts',
+  },
+
+  // ── Client / RM ───────────────────────────────────────────────────────────
   CLIENTS: {
     LIST:              '/api/clients',
     DETAIL:            (id) => `/api/clients/${id}`,

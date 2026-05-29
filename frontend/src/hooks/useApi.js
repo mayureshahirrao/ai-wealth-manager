@@ -105,21 +105,76 @@ export function usePerformance(clientId) {
   });
 }
 
-// ─── Investor Self-Service Hooks (clientId from auth) ─────────────────────────
+// ─── Investor Self-Service Hooks (/api/me/* — no clientId needed) ────────────
 
 export function useMyPortfolio() {
-  const { clientId } = useAuth();
-  return usePortfolio(clientId);
+  const { isAuthenticated } = useAuth();
+  return useQuery({
+    queryKey: ['me', 'portfolio'],
+    queryFn: () => apiClient.get(ENDPOINTS.ME.PORTFOLIO),
+    enabled: isAuthenticated,
+    ...PORTFOLIO_QUERY_CONFIG,
+  });
 }
 
 export function useMyGoals() {
-  const { clientId } = useAuth();
-  return useGoals(clientId);
+  const { isAuthenticated } = useAuth();
+  return useQuery({
+    queryKey: ['me', 'goals'],
+    queryFn: () => apiClient.get(ENDPOINTS.ME.GOALS),
+    enabled: isAuthenticated,
+    ...PORTFOLIO_QUERY_CONFIG,
+  });
 }
 
 export function useMyTaxSummary() {
-  const { clientId } = useAuth();
-  return useTaxSummary(clientId);
+  const { isAuthenticated } = useAuth();
+  return useQuery({
+    queryKey: ['me', 'taxSummary'],
+    queryFn: () => apiClient.get(ENDPOINTS.ME.TAX_SUMMARY),
+    enabled: isAuthenticated,
+    ...STATIC_QUERY_CONFIG,
+  });
+}
+
+export function useMyNavHistory() {
+  const { isAuthenticated } = useAuth();
+  return useQuery({
+    queryKey: ['me', 'navHistory'],
+    queryFn: () => apiClient.get(ENDPOINTS.ME.NAV_HISTORY),
+    enabled: isAuthenticated,
+    ...PORTFOLIO_QUERY_CONFIG,
+  });
+}
+
+export function useMyPerformance() {
+  const { isAuthenticated } = useAuth();
+  return useQuery({
+    queryKey: ['me', 'performance'],
+    queryFn: () => apiClient.get(ENDPOINTS.ME.PERFORMANCE),
+    enabled: isAuthenticated,
+    ...PORTFOLIO_QUERY_CONFIG,
+  });
+}
+
+export function useMyAlerts() {
+  const { isAuthenticated } = useAuth();
+  return useQuery({
+    queryKey: ['me', 'alerts'],
+    queryFn: () => apiClient.get(ENDPOINTS.ME.ALERTS),
+    enabled: isAuthenticated,
+    ...ALERTS_QUERY_CONFIG,
+  });
+}
+
+export function useMyProfile() {
+  const { isAuthenticated } = useAuth();
+  return useQuery({
+    queryKey: ['me', 'profile'],
+    queryFn: () => apiClient.get(ENDPOINTS.ME.PROFILE),
+    enabled: isAuthenticated,
+    ...STATIC_QUERY_CONFIG,
+  });
 }
 
 // ─── Chat History Hook ────────────────────────────────────────────────────────

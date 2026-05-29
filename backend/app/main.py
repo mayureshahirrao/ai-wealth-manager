@@ -17,6 +17,7 @@ from app.core.config import get_settings
 from app.core.error_handler import register_exception_handlers
 from app.core.logging_config import setup_logging, get_logger
 from app.database.transaction import init_db, close_db
+from app.ai.langsmith_tracer import setup_langsmith
 
 settings = get_settings()
 setup_logging(log_level=settings.LOG_LEVEL, log_format=settings.LOG_FORMAT)
@@ -32,6 +33,9 @@ async def lifespan(app: FastAPI):
     # Init database tables
     await init_db()
     logger.info("database_ready")
+
+    # Configure LangSmith tracing (no-op if key not set)
+    setup_langsmith()
 
     yield  # App runs here
 

@@ -1,0 +1,873 @@
+================================================================================
+AI WEALTH MANAGER — COMPLETE PROJECT ACTIVITY LOG
+Version: 0.4.0
+Generated: 2026-05-31
+Covers: Phase 1 through Phase 4 + v0.4.0 bugfix stabilisation
+================================================================================
+
+This log is a sequential, chronological record of every instruction, action,
+recommendation, decision, and deliverable produced during the project.
+It is updated at the end of each phase and re-generated as a new versioned file.
+
+--------------------------------------------------------------------------------
+TABLE OF CONTENTS
+--------------------------------------------------------------------------------
+  SECTION 1  — Project Inception & Skills Phase
+  SECTION 2  — Phase 1: Foundation Scaffold (v0.1.0)
+  SECTION 3  — Phase 2: Financial Engine & Data Layer (v0.2.0)
+  SECTION 4  — Phase 3+4: Claude Integration & AI Tools (v0.3.0)
+  SECTION 5  — v0.4.0: Bugfix & Stabilisation (Windows Compatibility)
+  SECTION 6  — Version & Documentation Commit
+  SECTION 7  — Artifacts Index (all files created/modified)
+  SECTION 8  — Pending Work (Phase 5 onwards)
+
+================================================================================
+SECTION 1 — PROJECT INCEPTION & SKILLS PHASE
+================================================================================
+
+USER INSTRUCTION:
+  (Initial project setup — context from prior compacted session)
+  Build an AI-powered wealth management platform for the Indian market.
+
+DECISIONS MADE:
+  - Platform: Robo-advisor / fintech app targeting Indian retail investors
+  - Regulatory context: SEBI (Investment Advisers) Regulations, 2013
+  - LLM: Claude Sonnet 4.6 (primary), Claude Haiku 4.5 (fast responses)
+  - Backend: Python 3.11 + FastAPI + SQLAlchemy 2.0 async + PostgreSQL 16
+  - Frontend: React 18 + Vite + Tailwind CSS + TanStack Query + Recharts
+  - Auth: JWT (python-jose) + bcrypt, role-based (investor / rm / compliance)
+  - Vector DB: ChromaDB 0.5 (for Phase 5 RAG)
+  - Observability: LangSmith tracing
+  - Indian financial constants: Budget 2024 (LTCG 12.5%, STCG 20%, new regime ₹75K std deduction)
+  - XIRR: Newton-Raphson with bisection fallback
+
+SKILLS PHASE OUTPUT:
+  - Skill files written to backend/skills/backend/ covering:
+    * financial/indian_constants.py
+    * financial/xirr.py
+    * financial/currency_formatter.py
+    * financial/sip_calculator.py
+    * financial/tax_calculator.py
+    * financial/goal_engine.py
+    * ai/compliance_injector.py
+    * ai/langsmith_tracer.py
+    * ai/response_validator.py
+    * ai/streaming.py
+    * ai/base_agent.py (LangGraph — noted as not used for Phase 4)
+  - Frontend skill files covering api/, hooks/, components/, utils/ layers
+
+================================================================================
+SECTION 2 — PHASE 1: FOUNDATION SCAFFOLD (v0.1.0)
+================================================================================
+
+--------------------------------------------------------------------------------
+2.1  INSTRUCTION
+--------------------------------------------------------------------------------
+USER: (Approved full implementation plan after skills phase)
+      "Start Phase 1 — build the foundation scaffold."
+
+--------------------------------------------------------------------------------
+2.2  ACTIONS PERFORMED
+--------------------------------------------------------------------------------
+
+INFRASTRUCTURE:
+  Created: docker-compose.yml
+    - PostgreSQL 16 (port 5432), ChromaDB 0.5 (port 8001)
+    - FastAPI backend container, React frontend container
+    - Named volumes: postgres_data, chroma_data
+    - Health checks on all services
+
+  Created: .env.example
+    - ANTHROPIC_API_KEY, LANGCHAIN_*, JWT_*, DATABASE_URL, CHROMA_*, APP_*
+
+  Created: Makefile
+    - Targets: up, down, restart, migrate, seed, migrate-seed,
+               backend, backend-install, frontend, frontend-install,
+               dev, logs, logs-backend, shell-db, clean, help
+
+BACKEND SCAFFOLD (backend/app/):
+  Created: app/__init__.py
+  Created: app/core/config.py         — pydantic-settings Settings class
+  Created: app/core/exceptions.py     — custom exception hierarchy
+  Created: app/core/base_response.py  — APIResponse wrapper
+  Created: app/core/logging_config.py — structlog setup + log_ai_call()
+  Created: app/core/error_handler.py  — FastAPI exception handlers
+  Created: app/database/base_model.py — WealthBase + all 9 enum classes
+  Created: app/database/models.py     — 11 SQLAlchemy ORM models
+  Created: app/database/repository.py — base repository pattern
+  Created: app/database/transaction.py — get_db(), init_db(), close_db()
+  Created: app/auth/password_utils.py — hash_password(), verify_password()
+  Created: app/auth/jwt_handler.py    — create_access_token(), verify_token()
+  Created: app/auth/role_guard.py     — get_current_user(), CurrentUser, role decorators
+  Created: app/auth/router.py         — POST /api/auth/login, GET /api/auth/me
+  Created: app/api/clients.py         — stub RM client endpoints
+  Created: app/api/chat.py            — stub SSE streaming endpoint
+  Created: app/api/rm.py              — stub RM copilot endpoints
+  Created: app/api/compliance.py      — stub compliance endpoints
+  Created: app/api/financial_plan.py  — stub financial plan endpoint
+  Created: app/api/market.py          — stub market data endpoint
+  Created: app/main.py                — FastAPI app, lifespan, CORS, routers
+  Created: app/seed/seed_data.py      — stub (expanded in Phase 2)
+  Created: alembic/env.py             — async Alembic migration environment
+  Created: alembic.ini
+  Created: backend/Dockerfile
+  Created: backend/requirements.txt
+
+FRONTEND SCAFFOLD (frontend/src/):
+  Created: api/apiClient.js           — Axios instance + JWT interceptor + authStorage
+  Created: api/endpoints.js           — all URL constants
+  Created: hooks/useAuth.js           — AuthProvider, useAuth, login/logout
+  Created: hooks/useApi.js            — React Query wrappers for all endpoints
+  Created: utils/constants.js         — ROLES, POLLING intervals, ROUTES
+  Created: utils/formatters.js        — formatINR(), formatDate(), formatPercent()
+  Created: pages/Login.jsx            — login form with demo account quick-fill buttons
+  Created: pages/investor/PortfolioOverview.jsx
+  Created: pages/investor/GoalsView.jsx
+  Created: pages/investor/ChatView.jsx
+  Created: pages/investor/TaxView.jsx
+  Created: pages/rm/ClientList.jsx
+  Created: pages/rm/ClientDetail.jsx
+  Created: pages/rm/NextActions.jsx
+  Created: pages/rm/FinancialPlanView.jsx
+  Created: pages/compliance/AuditLogView.jsx
+  Created: pages/compliance/RiskAlertsView.jsx
+  Created: pages/compliance/AIGovernanceView.jsx
+  Created: components/AppShell.jsx    — sidebar navigation, role-based colour coding
+  Created: App.jsx, main.jsx, index.css
+  Created: vite.config.js, tailwind.config.js, postcss.config.js
+  Created: frontend/package.json, frontend/Dockerfile
+
+--------------------------------------------------------------------------------
+2.3  DELIVERABLES
+--------------------------------------------------------------------------------
+  - Full project directory structure established
+  - Docker Compose services defined
+  - FastAPI app boots (confirmed working)
+  - Login page confirmed working at http://localhost:3000
+  - All API stub endpoints return 200 with placeholder data
+  - Git commit: "feat: Phase 1 foundation — skills layer + full project scaffold"
+  - Version: 0.1.0 (set in config.py, package.json)
+
+================================================================================
+SECTION 3 — PHASE 2: FINANCIAL ENGINE & DATA LAYER (v0.2.0)
+================================================================================
+
+--------------------------------------------------------------------------------
+3.1  INSTRUCTION
+--------------------------------------------------------------------------------
+USER: "Start Phase 2."
+
+--------------------------------------------------------------------------------
+3.2  ACTIONS PERFORMED
+--------------------------------------------------------------------------------
+
+FINANCIAL CALCULATION ENGINE:
+  Created: backend/app/financial/__init__.py
+    - Public API exposing all key functions
+
+  Created: backend/app/financial/indian_constants.py
+    - Single source of truth for all Indian financial parameters
+    - Budget 2024: LTCG 12.5% (above ₹1.25L), STCG 20%
+    - New regime: slabs, ₹75K std deduction, 87A rebate ₹25K up to ₹7L income
+    - Old regime: slabs, ₹50K std deduction, 87A rebate ₹12.5K up to ₹5L income
+    - NPS, PPF, EPF, SCSS, SGB parameters
+    - MF categories (AMFI), ELSS lock-in
+    - Wealth segments (retail / mass affluent / HNI / UHNI)
+    - SIP defaults: 12% equity return, 7% debt, 6% inflation, 10% step-up
+    - Risk profile thresholds, SEBI compliance constants
+    - SEBI_DISCLAIMER string (appended to all AI responses)
+    - LRS limits, TCS rates
+
+  Created: backend/app/financial/xirr.py
+    - Newton-Raphson XIRR with bisection fallback
+    - Handles irregular SIP + lumpsum cashflow arrays
+    - Returns annualised XIRR as float
+
+  Created: backend/app/financial/currency_formatter.py
+    - format_inr(): ₹2.50 Cr / ₹45.00 L / ₹9,500 adaptive formatting
+
+  Created: backend/app/financial/sip_calculator.py
+    - sip_future_value()
+    - lumpsum_future_value()
+    - required_monthly_sip()
+    - stepup_sip_future_value()
+    - inflation_adjusted_value()
+
+  Created: backend/app/financial/tax_calculator.py
+    - calculate_new_regime_tax()
+    - calculate_old_regime_tax() with full deduction set (80C, 80D, NPS, HRA, 24B)
+    - compare_tax_regimes() — returns both results + recommendation
+    - calculate_ltcg_tax() — Budget 2024 12.5% above ₹1.25L exemption
+    - calculate_stcg_tax() — Budget 2024 20%
+    - ltcg_harvesting_opportunity() — tax-free harvest up to ₹1.25L before March 31
+
+  Created: backend/app/financial/goal_engine.py
+    - GoalAssessment dataclass: feasibility 0–100, status, recommendation
+    - assess_retirement_readiness(): inflation-adjusted corpus gap analysis
+    - Status classification: on_track / slightly_off / needs_action / at_risk
+
+DATABASE MIGRATION:
+  Created: backend/alembic/versions/001_initial_schema.py
+    - Hand-written DDL for 11 tables:
+      clients, users, portfolios, holdings, nav_history, goals,
+      transactions, alerts, chat_messages, ai_audit_logs, compliance_documents
+    - 9 PostgreSQL enum types (all lowercase values)
+    - Proper FK ordering (clients before users)
+    - downgrade() with DROP TABLE + DROP TYPE IF EXISTS
+
+SEED DATA:
+  Updated: backend/app/seed/seed_data.py
+    5 Indian demo personas:
+      - Priya Sharma, 34, moderate, new regime, ₹22L income
+      - Arjun Kapoor, 42, aggressive, old regime, ₹1.2Cr income
+      - Sunita Rao, 58, conservative, old regime, ₹15L income
+      - Vikram Nair, 28, moderately aggressive, new regime, ₹18L income
+      - Meena Iyer, 47, moderate, new regime, ₹35L income
+    3 investor login accounts (first 3 clients)
+    2 staff accounts (rm@, compliance@)
+    3 holdings per client (Mirae Large Cap, HDFC Short Duration, SBI Gold ETF)
+    24 months SIP transactions + lumpsum buys (for XIRR computation)
+    24 months NAV history per portfolio
+    2 goals per client (Retirement Corpus + Children Education)
+    2 compliance alerts (Sunita: REVIEW_OVERDUE, Arjun: CONCENTRATION_RISK)
+
+ENRICHED API ENDPOINTS:
+  Updated: backend/app/api/clients.py
+    - GET /api/clients: AUM, XIRR, active alerts count, days since review
+    - GET /api/clients/{id}/goals: GoalAssessment feasibility scores
+    - GET /api/clients/{id}/tax-summary: compare_tax_regimes + ltcg_harvesting
+    - GET /api/clients/{id}/portfolio, nav-history, performance: enriched
+
+  Created: backend/app/api/me.py (7 investor self-service endpoints)
+    - GET /api/me/portfolio
+    - GET /api/me/goals
+    - GET /api/me/tax-summary
+    - GET /api/me/nav-history
+    - GET /api/me/performance
+    - GET /api/me/profile
+    - GET /api/me/alerts
+
+AUTH ENHANCEMENTS:
+  Updated: backend/app/auth/jwt_handler.py
+    - create_access_token() accepts optional client_id: Optional[uuid.UUID]
+    - client_id embedded in JWT payload
+
+  Updated: backend/app/auth/role_guard.py
+    - CurrentUser dataclass includes client_id: Optional[uuid.UUID]
+    - get_current_user() extracts client_id from JWT
+
+  Updated: backend/app/auth/router.py
+    - Login passes client_id to create_access_token()
+
+  Updated: backend/app/main.py
+    - Added me_router import and include_router
+
+--------------------------------------------------------------------------------
+3.3  GIT WORKFLOW
+--------------------------------------------------------------------------------
+  ISSUE: Phase 2 was initially committed directly to master.
+
+  RESOLUTION:
+    - Created branch phase-2/data-layer at Phase 2 commit
+    - Force-reset master to Phase 1 commit (git reset --hard)
+    - Pushed both branches
+    - Created PR #1 via GitHub CLI
+    - User merged PR #1 on CLI
+    - Branch deleted after merge
+
+  NOTE: PR body required temp file approach (Windows PowerShell does not
+        support bash heredoc syntax for gh --body flag)
+
+--------------------------------------------------------------------------------
+3.4  DELIVERABLES
+--------------------------------------------------------------------------------
+  - Financial engine: 6 modules, 25+ functions
+  - Alembic migration: 11 tables, 9 enum types
+  - Seed: 5 clients, 2 staff, ~255 transactions, 120 NAV records
+  - 7 investor self-service endpoints (/api/me/*)
+  - JWT now carries client_id for investor role
+  - Git: PR #1 merged to master
+  - Version: 0.2.0
+
+================================================================================
+SECTION 4 — PHASE 3+4: CLAUDE INTEGRATION & AI TOOLS (v0.3.0)
+================================================================================
+
+--------------------------------------------------------------------------------
+4.1  INSTRUCTION
+--------------------------------------------------------------------------------
+USER: "Start phase 3."
+
+ASSISTANT DECISION:
+  Phase 3 (auth completion) was largely done in Phase 1.
+  Decision: Combine Phase 3 + Phase 4 into a single implementation sprint
+  covering Claude integration, 5 AI tools, SSE streaming, and LangSmith.
+
+USER APPROVED: (implicit — user said "start phase 3")
+
+--------------------------------------------------------------------------------
+4.2  ARCHITECTURE DECISIONS
+--------------------------------------------------------------------------------
+
+DECISION: streaming.py (direct loop) vs base_agent.py (LangGraph)
+  OPTIONS PRESENTED:
+    A) LangGraph StateGraph — full agent with typed state, complex branching
+    B) streaming.py agentic loop — simpler, direct tool-use loop, up to 5 iter
+  CHOSEN: Option B (streaming.py) — simpler, no state machine overhead,
+          sufficient for linear tool-use chat pattern
+
+DECISION: Tool injection pattern
+  PROBLEM: Tools need AsyncSession (DB) but registry must dispatch by name
+  SOLUTION: Create tool instances per-request with session injected in __init__
+            Build a new ToolRegistry per request via build_tool_registry(db)
+
+DECISION: Chat persistence strategy
+  PROBLEM: Must save ChatMessage + AIAuditLog after SSE stream ends
+  SOLUTION: Wrap stream generator in try/finally — persist in finally block
+            (runs even if client disconnects mid-stream)
+
+--------------------------------------------------------------------------------
+4.3  ACTIONS PERFORMED
+--------------------------------------------------------------------------------
+
+AI INFRASTRUCTURE:
+  Created: backend/app/ai/claude_client.py
+    - ClaudeClient class wrapping anthropic.AsyncAnthropic
+    - complete() — text completion without tools
+    - complete_with_tools() — tool-use completion
+    - Both methods: tenacity retry (3 attempts, exponential backoff)
+    - Retries on: RateLimitError, APIStatusError
+    - get_claude_client() — lru_cache singleton
+
+  Created: backend/app/ai/base_tool.py
+    - Abstract BaseTool with name, description class vars
+    - tool_schema property (abstract) — Anthropic-compatible dict
+    - _execute() method (abstract) — core tool logic
+    - __call__() — timing, SEBI audit logging, error wrapping to AIToolExecutionError
+
+  Created: backend/app/ai/tool_registry.py
+    - ToolRegistry: register(), get_schemas(), dispatch(), list_tools()
+    - ToolNames constants:
+        GET_PORTFOLIO_SUMMARY, GET_GOAL_PROGRESS, CALCULATE_TAX_LIABILITY,
+        GET_MARKET_DATA, RUN_RETIREMENT_PROJECTION
+    - INVESTOR_TOOLS = all 5 tools
+    - RM_TOOLS = 4 tools (no market data)
+
+  Created: backend/app/ai/compliance_injector.py
+    - QueryType enum: PORTFOLIO, TAX, RETIREMENT, INVESTMENT_ADVICE,
+                      BEHAVIORAL, MARKET, GENERAL
+    - PROHIBITED_PHRASES list (guaranteed returns, risk-free, etc.)
+    - RATIONALE_INDICATORS list (recommend, suggest, etc.)
+    - classify_query() — keyword-based classification
+    - inject_disclaimer() — appends SEBI_DISCLAIMER when required
+    - validate_response_compliance() — checks for prohibited phrases,
+                                       rationale presence for investment advice
+    - estimate_confidence() — heuristic 0.0–0.95 based on tools used,
+                              RAG sources, response length, uncertainty phrases
+
+  Created: backend/app/ai/langsmith_tracer.py
+    - setup_langsmith() — sets LANGCHAIN_* env vars; no-op if key not set
+    - get_trace_metadata() — builds metadata dict for LangSmith trace tagging
+
+  Created: backend/app/ai/response_validator.py
+    - ValidationResult dataclass (is_valid, errors, warnings, confidence_penalty)
+    - validate_tax_response() — effective rate bounds, regime validity
+    - validate_retirement_response() — corpus range, feasibility score bounds
+    - validate_investment_advice_response() — XIRR bounds, AUM positivity
+    - validate_figure_plausibility() — spot-check individual key/value pairs
+    - run_full_validation() — dispatcher by tool name
+
+  Created: backend/app/ai/streaming.py
+    - sse_event() — formats dict as "data: {json}\n\n"
+    - stream_chat_response() — async generator:
+        * Calls claude.complete_with_tools()
+        * Handles tool_use stop reason: dispatch → yield tool events
+        * Handles end_turn: stream text deltas
+        * Post-loop: inject disclaimer, compute confidence
+        * Yields: delta, tool_call, tool_result, done, error events
+        * Max 5 iterations safety limit
+    - _block_to_dict() — converts Anthropic content block to serializable dict
+    - build_investor_system_prompt() — role-aware Claude system prompt
+    - build_rm_system_prompt() — RM copilot system prompt
+
+  Created: backend/app/ai/__init__.py
+    - Public API exposing all key functions and classes
+
+5 AI TOOLS:
+  Created: backend/app/ai/tools/__init__.py
+    - build_tool_registry(db) — factory: creates ToolRegistry with all 5 tools
+                                         DB-injected per request
+
+  Created: backend/app/ai/tools/get_portfolio_summary.py
+    - Queries Portfolio + Holdings (selectinload)
+    - Returns: AUM, XIRR vs benchmark, outperformance, allocation %,
+               top 5 holdings with gain/loss, active SIPs, total SIP/month
+    - tool_schema: input {client_id: string}
+
+  Created: backend/app/ai/tools/get_goal_progress.py
+    - Queries Goals, runs GoalAssessment for each
+    - Returns: per-goal feasibility scores, shortfall, recommendation,
+               summary stats (on_track count, at_risk count, avg score)
+    - tool_schema: input {client_id: string}
+
+  Created: backend/app/ai/tools/calculate_tax_liability.py
+    - Queries Client (income, age, tax regime) + Holdings (LTCG calculation)
+    - Calls compare_tax_regimes() + ltcg_harvesting_opportunity()
+    - LTCG: only equity holdings held > 12 months qualify
+    - Returns: regime comparison, harvesting opportunity, summary
+    - tool_schema: input {client_id, gross_income?, age?}
+
+  Created: backend/app/ai/tools/get_market_data.py
+    - Static demo data (Phase 5 → live NSE/BSE API)
+    - Returns: Nifty 50, Sensex, midcap, smallcap, India VIX,
+               RBI repo rate, G-Sec yield, MCX gold, USD/INR,
+               market sentiment, upcoming events
+    - tool_schema: input {indices?: array} (optional filter)
+
+  Created: backend/app/ai/tools/run_retirement_projection.py
+    - Queries Client (age) + Goals (retirement corpus, SIP)
+    - Falls back to 40% of portfolio as corpus estimate if no retirement goal
+    - Calls assess_retirement_readiness()
+    - Returns: years to retirement, required corpus, projected corpus,
+               shortfall, feasibility score, additional SIP needed
+    - Assumptions: 6% inflation, 12% accumulation return, 6% post-retirement
+    - tool_schema: input {client_id, target_retirement_age?, desired_monthly_income?}
+
+CHAT ENDPOINT REWRITE:
+  Updated: backend/app/api/chat.py (full rewrite of stub)
+    - Validates client_id UUID format
+    - Investor access control: 403 if querying another client's client_id
+    - Fetches client for system prompt (name, risk_profile)
+    - Builds per-request ToolRegistry via build_tool_registry(db)
+    - Role-based tool selection: INVESTOR_TOOLS vs RM_TOOLS
+    - event_stream() async generator:
+        * Calls stream_chat_response()
+        * Accumulates text + tools_used + confidence from SSE events
+        * Yields SSE events to client
+        * finally: calls _persist_chat()
+    - _persist_chat(): saves ChatMessage (user + assistant) + AIAuditLog
+    - SSE response headers: Cache-Control: no-cache, X-Accel-Buffering: no
+    - GET /api/chat/history/{client_id}: role-aware access control
+
+MAIN APP UPDATE:
+  Updated: backend/app/main.py
+    - Added: from app.ai.langsmith_tracer import setup_langsmith
+    - Called setup_langsmith() in lifespan startup handler
+
+AUTH ENDPOINT UPDATE:
+  Updated: backend/app/auth/router.py
+    - GET /api/auth/me: now fetches client name from DB
+    - Returns: user_id, email, role, name, client_id
+
+FRONTEND UPDATES:
+  Updated: frontend/src/api/endpoints.js
+    - Added ME namespace:
+        ME.PORTFOLIO  = '/api/me/portfolio'
+        ME.GOALS      = '/api/me/goals'
+        ME.TAX_SUMMARY = '/api/me/tax-summary'
+        ME.NAV_HISTORY = '/api/me/nav-history'
+        ME.PERFORMANCE = '/api/me/performance'
+        ME.PROFILE    = '/api/me/profile'
+        ME.ALERTS     = '/api/me/alerts'
+
+  Updated: frontend/src/hooks/useApi.js
+    - useMyPortfolio() → GET /api/me/portfolio (no clientId needed)
+    - useMyGoals() → GET /api/me/goals
+    - useMyTaxSummary() → GET /api/me/tax-summary
+    - useMyNavHistory() → GET /api/me/nav-history  [new]
+    - useMyPerformance() → GET /api/me/performance  [new]
+    - useMyAlerts() → GET /api/me/alerts  [new]
+    - useMyProfile() → GET /api/me/profile  [new]
+    - All use isAuthenticated guard (not clientId)
+
+--------------------------------------------------------------------------------
+4.4  GIT WORKFLOW
+--------------------------------------------------------------------------------
+  Branch: phase-3-4/claude-integration
+  Commit: "feat: Phase 3+4 — Claude integration, 5 AI tools, SSE streaming, SEBI compliance"
+  Files: 19 files, 2248 insertions
+  PR #2 created, merged by user, branch deleted
+  Master updated to efbb859
+
+--------------------------------------------------------------------------------
+4.5  DELIVERABLES
+--------------------------------------------------------------------------------
+  - 7 AI infrastructure modules
+  - 5 AI tools (all DB-injected per-request)
+  - Full agentic SSE streaming chat endpoint
+  - SEBI compliance layer (query classification, disclaimer, prohibited phrases)
+  - LangSmith tracing (optional, enabled via env var)
+  - Response validation with confidence scoring
+  - Frontend ME namespace + 7 updated/new React Query hooks
+  - Version: 0.3.0
+
+================================================================================
+SECTION 5 — v0.4.0: BUGFIX & STABILISATION (WINDOWS COMPATIBILITY)
+================================================================================
+
+--------------------------------------------------------------------------------
+5.1  INSTRUCTION
+--------------------------------------------------------------------------------
+USER: "Test previous phases first."
+
+--------------------------------------------------------------------------------
+5.2  ISSUES ENCOUNTERED & RESOLUTIONS
+--------------------------------------------------------------------------------
+
+ISSUE 1: make command not found
+  CAUSE: GNU Make not installed on Windows
+  RESOLUTION: Provided equivalent direct commands for each make target
+  IMPACT: None on codebase; documentation/workflow only
+
+ISSUE 2: docker command not found
+  CAUSE: Docker Desktop not installed
+  RESOLUTION: Guided user to install Docker Desktop (AMD64 build confirmed)
+  USER QUESTION: "Which option to select — AMD64 or ARM64?"
+  ANSWER: Provided instructions to check PROCESSOR_ARCHITECTURE env var;
+          AMD64 confirmed correct for standard Windows Intel/AMD machines
+
+ISSUE 3: Docker DNS resolution failure
+  ERROR: "failed to resolve reference: dial tcp: lookup registry-1.docker.io:
+          no such host"
+  CAUSE: Docker Desktop DNS not resolving external hostnames
+  RESOLUTION: Added "dns": ["8.8.8.8", "8.8.4.4"] to Docker Engine JSON config
+              in Docker Desktop Settings → Docker Engine → Apply & Restart
+
+ISSUE 4: .venv not found
+  CAUSE: Virtual environment not yet created
+  RESOLUTION: python -m venv .venv && .venv\Scripts\pip install -r requirements.txt
+
+ISSUE 5: anthropic==0.39.0 conflicts with langchain-anthropic==0.3.3
+  ERROR: "langchain-anthropic 0.3.3 depends on anthropic<1 and >=0.41.0"
+  CAUSE: anthropic was pinned too low
+  ACTION: Changed requirements.txt: anthropic==0.39.0 → anthropic>=0.41.0
+  FILE CHANGED: backend/requirements.txt
+
+ISSUE 6: chroma-hnswlib build failure
+  ERROR: "Microsoft Visual C++ 14.0 or greater is required"
+  CAUSE: ChromaDB requires C++ Build Tools to compile hnswlib extension on Windows
+  DECISION: Defer ChromaDB installation to Phase 5 (not needed for current features)
+  ACTION: Commented out chromadb==0.5.23 and sentence-transformers==3.3.1
+  FILE CHANGED: backend/requirements.txt
+
+ISSUE 7: Password authentication failed for wm_user
+  ERROR: "asyncpg.exceptions.InvalidPasswordError: password authentication
+          failed for user wm_user"
+  INVESTIGATION STEPS:
+    Step 1: Checked docker-compose.yml — credentials correct (wm_user/wm_password)
+    Step 2: Verified .env file content — DATABASE_URL correct
+    Step 3: docker exec psql test — worked (Unix socket auth, bypasses password)
+    Step 4: netstat -an — revealed local PostgreSQL also on port 5432
+  ROOT CAUSE: User has local PostgreSQL installed; asyncpg was connecting to
+              local instance which doesn't have wm_user credentials
+  RESOLUTION:
+    - Changed docker-compose.yml postgres port: "5432:5432" → "5433:5432"
+    - Changed config.py DATABASE_URL default: port 5432 → 5433
+    - Instructed user to copy .env to backend/ directory
+    - Updated backend/.env DATABASE_URL to use port 5433
+  FILES CHANGED: docker-compose.yml, backend/app/core/config.py
+
+ISSUE 8: pydantic-settings not finding .env file
+  ROOT CAUSE: pydantic-settings resolves env_file=".env" relative to CWD.
+              Alembic runs from backend/ directory.
+              .env was only at project root.
+  RESOLUTION: Instructed user to copy project root .env to backend/.env
+              Changed config.py default DATABASE_URL to port 5433 as fallback
+
+ISSUE 9: DuplicateObjectError: type "riskprofile" already exists
+  ERROR: Alembic migration fails with duplicate enum type
+  INVESTIGATION:
+    - Confirmed DB was empty via docker exec psql \dT
+    - Confirmed URL resolves to port 5433 via python -c "print(get_settings().DATABASE_URL)"
+    - Identified root cause: explicit op.execute("CREATE TYPE riskprofile...")
+      in upgrade() creates the enum, then op.create_table("clients") triggers
+      SQLAlchemy's before_create event which ALSO tries to CREATE TYPE riskprofile
+      without IF NOT EXISTS — double creation causes the error
+  RESOLUTION ATTEMPTS:
+    1. docker compose down -v + docker compose up → still failed
+    2. Added IF NOT EXISTS to CREATE TYPE → still failed (SQLAlchemy's
+       create_table also creates enum without IF NOT EXISTS)
+    3. DROP SCHEMA public CASCADE + CREATE SCHEMA public → still failed
+    4. DROP DATABASE + CREATE DATABASE → still failed
+  FINAL RESOLUTION:
+    - Removed all explicit op.execute("CREATE TYPE...") lines from upgrade()
+    - SQLAlchemy creates enum types automatically during create_table()
+    - Each enum used in exactly one table → no duplication possible
+  FILE CHANGED: backend/alembic/versions/001_initial_schema.py
+
+ISSUE 10: InvalidTextRepresentationError: invalid input value for enum userrole "RM"
+  ERROR: Seed data inserts 'RM' but PostgreSQL enum has 'rm'
+  ROOT CAUSE: SQLAlchemy 2.x uses enum member .name (uppercase: 'RM', 'COMPLIANCE')
+              by default for storage in native PostgreSQL enums.
+              PostgreSQL enum was created with lowercase values ('rm', 'compliance').
+  RESOLUTION:
+    - Added _enum() helper function to models.py:
+        def _enum(enum_class):
+            return SAEnum(enum_class, values_callable=lambda x: [e.value for e in x])
+    - Replaced all SAEnum(EnumClass) calls with _enum(EnumClass) for all 9 enum columns
+  COLUMNS UPDATED:
+    User.role, Client.risk_profile, Client.tax_regime, Holding.asset_class,
+    Goal.goal_type, Transaction.transaction_type, Alert.alert_type,
+    Alert.priority, ComplianceDocument.doc_type
+  FILE CHANGED: backend/app/database/models.py
+
+ISSUE 11: (trapped) error reading bcrypt version
+  ERROR: passlib 1.7.4 incompatible with bcrypt 4.x
+         "ValueError: password cannot be longer than 72 bytes"
+  CAUSE: pip installed latest bcrypt (4.1+); passlib 1.7.4 uses internal
+         bcrypt API that changed in 4.x; 4.0.1 was specifically patched
+         to restore passlib compatibility
+  RESOLUTION: Added bcrypt==4.0.1 to requirements.txt
+              .venv\Scripts\pip install bcrypt==4.0.1
+  FILE CHANGED: backend/requirements.txt
+
+ISSUE 12: email-validator not installed
+  ERROR: "ImportError: email-validator is not installed"
+  CAUSE: pydantic[email] extra not in requirements.txt
+  RESOLUTION: Added email-validator==2.2.0 to requirements.txt
+              .venv\Scripts\pip install email-validator
+  FILE CHANGED: backend/requirements.txt
+
+--------------------------------------------------------------------------------
+5.3  FINAL SUCCESSFUL SEQUENCE
+--------------------------------------------------------------------------------
+  1. docker compose up -d postgres chromadb
+  2. .venv\Scripts\python -m alembic upgrade head
+     → "Running upgrade -> 001, initial_schema" ✅
+  3. .venv\Scripts\python -m app.seed.seed_data
+     → "Seeded 5 clients, 2 staff users, alerts, ~255 transactions." ✅
+  4. .venv\Scripts\uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+     (pending email-validator fix, then backend starts)
+
+--------------------------------------------------------------------------------
+5.4  DELIVERABLES
+--------------------------------------------------------------------------------
+  - All dependency conflicts resolved
+  - Migration runs cleanly on fresh database
+  - Seed completes successfully
+  - Version: 0.4.0
+
+================================================================================
+SECTION 6 — VERSION & DOCUMENTATION COMMIT
+================================================================================
+
+--------------------------------------------------------------------------------
+6.1  INSTRUCTION
+--------------------------------------------------------------------------------
+USER: "Commit all changes to Git. Add and maintain a project version number.
+       For every new commit, update the version accordingly. Update README.md.
+       Keep documentation synchronized with the codebase."
+
+--------------------------------------------------------------------------------
+6.2  VERSIONING SYSTEM ESTABLISHED
+--------------------------------------------------------------------------------
+  VERSION POLICY:
+    MAJOR — breaking API/schema changes
+    MINOR — new phase / significant feature set
+    PATCH — bug fixes, dependency pins, config corrections
+
+  VERSION HISTORY:
+    0.1.0 — Phase 1: Foundation scaffold
+    0.2.0 — Phase 2: Financial engine + data layer
+    0.3.0 — Phase 3+4: Claude integration (PR #2)
+    0.4.0 — Bugfix stabilisation (current)
+
+  FUTURE ROADMAP:
+    0.5.0 — Phase 5: ChromaDB RAG pipeline
+    0.6.0 — Phase 6: End-to-end live testing
+    0.7.0 — Phase 7: RM Copilot full implementation
+    0.8.0 — Phase 8: Compliance dashboard full implementation
+    0.9.0 — Phase 9: Frontend polish
+    1.0.0 — Phase 10: Demo-ready release
+
+  THREE FILES KEPT IN SYNC:
+    VERSION                          — canonical single-line version file
+    backend/app/core/config.py       — APP_VERSION (returned in /health)
+    frontend/package.json            — version field
+
+--------------------------------------------------------------------------------
+6.3  ACTIONS PERFORMED
+--------------------------------------------------------------------------------
+  Created: VERSION                   — "0.4.0"
+  Created: README.md                 — comprehensive project documentation
+  Created: CHANGELOG.md              — full history from 0.1.0 to 0.4.0
+  Created: docs/project_activity_log_v0.4.0.txt  — this file
+  Updated: backend/app/core/config.py — APP_VERSION = "0.4.0"
+  Updated: frontend/package.json      — "version": "0.4.0"
+
+  Git commit: "chore: v0.4.0 — Windows compatibility fixes, dependency stabilisation, docs"
+  Pushed to: origin/master (commit 05aebad)
+
+--------------------------------------------------------------------------------
+6.4  README.md CONTENTS SUMMARY
+--------------------------------------------------------------------------------
+  - Features section (investor / RM / compliance / AI capabilities)
+  - Tech stack table
+  - Project status table (phases 1–10 with status)
+  - Prerequisites (Python 3.11, Node 18, Docker Desktop, Anthropic key)
+  - Windows-specific notes (port 5433, .env in backend/)
+  - Quick start (5 steps: clone, configure, backend setup, start backend, start frontend)
+  - Demo accounts table (5 investor accounts + RM + compliance)
+  - API reference (key endpoints + SSE protocol documentation)
+  - Environment variables table
+  - Project structure tree
+  - Indian financial context section
+  - Known limitations (market data stub, ChromaDB not active, RM/compliance stubs)
+  - Versioning section with roadmap table
+
+================================================================================
+SECTION 7 — ARTIFACTS INDEX
+================================================================================
+
+All files created or modified across Phases 1–4 and v0.4.0 bugfix:
+
+INFRASTRUCTURE:
+  docker-compose.yml                  Created Phase 1, modified v0.4.0 (port)
+  .env.example                        Created Phase 1
+  Makefile                            Created Phase 1
+  VERSION                             Created v0.4.0
+  README.md                           Created v0.4.0
+  CHANGELOG.md                        Created v0.4.0
+  docs/project_activity_log_v0.4.0.txt  Created v0.4.0 (this file)
+
+BACKEND — Core:
+  backend/app/__init__.py             Created Phase 1
+  backend/app/core/config.py          Created Phase 1, modified v0.4.0
+  backend/app/core/exceptions.py      Created Phase 1
+  backend/app/core/base_response.py   Created Phase 1
+  backend/app/core/logging_config.py  Created Phase 1
+  backend/app/core/error_handler.py   Created Phase 1
+
+BACKEND — Database:
+  backend/app/database/base_model.py  Created Phase 1
+  backend/app/database/models.py      Created Phase 1, modified v0.4.0
+  backend/app/database/repository.py  Created Phase 1
+  backend/app/database/transaction.py Created Phase 1
+
+BACKEND — Auth:
+  backend/app/auth/password_utils.py  Created Phase 1
+  backend/app/auth/jwt_handler.py     Created Phase 1, modified Phase 2
+  backend/app/auth/role_guard.py      Created Phase 1, modified Phase 2
+  backend/app/auth/router.py          Created Phase 1, modified Phase 3+4
+
+BACKEND — API:
+  backend/app/api/clients.py          Created Phase 1, enriched Phase 2
+  backend/app/api/me.py               Created Phase 2
+  backend/app/api/chat.py             Created Phase 1 (stub), rewritten Phase 3+4
+  backend/app/api/rm.py               Created Phase 1 (stub)
+  backend/app/api/compliance.py       Created Phase 1 (stub)
+  backend/app/api/financial_plan.py   Created Phase 1 (stub)
+  backend/app/api/market.py           Created Phase 1 (stub)
+
+BACKEND — Financial Engine:
+  backend/app/financial/__init__.py       Created Phase 2
+  backend/app/financial/indian_constants.py  Created Phase 2
+  backend/app/financial/xirr.py          Created Phase 2
+  backend/app/financial/currency_formatter.py  Created Phase 2
+  backend/app/financial/sip_calculator.py   Created Phase 2
+  backend/app/financial/tax_calculator.py   Created Phase 2
+  backend/app/financial/goal_engine.py      Created Phase 2
+
+BACKEND — AI Module:
+  backend/app/ai/__init__.py              Created Phase 3+4
+  backend/app/ai/claude_client.py         Created Phase 3+4
+  backend/app/ai/base_tool.py             Created Phase 3+4
+  backend/app/ai/tool_registry.py         Created Phase 3+4
+  backend/app/ai/compliance_injector.py   Created Phase 3+4
+  backend/app/ai/langsmith_tracer.py      Created Phase 3+4
+  backend/app/ai/response_validator.py    Created Phase 3+4
+  backend/app/ai/streaming.py             Created Phase 3+4
+  backend/app/ai/tools/__init__.py        Created Phase 3+4
+  backend/app/ai/tools/get_portfolio_summary.py    Created Phase 3+4
+  backend/app/ai/tools/get_goal_progress.py        Created Phase 3+4
+  backend/app/ai/tools/calculate_tax_liability.py  Created Phase 3+4
+  backend/app/ai/tools/get_market_data.py          Created Phase 3+4
+  backend/app/ai/tools/run_retirement_projection.py  Created Phase 3+4
+
+BACKEND — Other:
+  backend/app/main.py                     Created Phase 1, modified Phase 3+4
+  backend/app/seed/seed_data.py           Created Phase 1, expanded Phase 2
+  backend/alembic/env.py                  Created Phase 1
+  backend/alembic/versions/001_initial_schema.py  Created Phase 2, fixed v0.4.0
+  backend/alembic.ini                     Created Phase 1
+  backend/requirements.txt               Created Phase 1, modified v0.4.0
+
+FRONTEND:
+  frontend/src/api/apiClient.js           Created Phase 1
+  frontend/src/api/endpoints.js           Created Phase 1, modified Phase 3+4
+  frontend/src/hooks/useAuth.js           Created Phase 1
+  frontend/src/hooks/useApi.js            Created Phase 1, modified Phase 3+4
+  frontend/src/utils/constants.js         Created Phase 1
+  frontend/src/utils/formatters.js        Created Phase 1
+  frontend/src/pages/Login.jsx            Created Phase 1
+  frontend/src/pages/investor/PortfolioOverview.jsx  Created Phase 1
+  frontend/src/pages/investor/GoalsView.jsx          Created Phase 1
+  frontend/src/pages/investor/ChatView.jsx           Created Phase 1
+  frontend/src/pages/investor/TaxView.jsx            Created Phase 1
+  frontend/src/pages/rm/ClientList.jsx               Created Phase 1
+  frontend/src/pages/rm/ClientDetail.jsx             Created Phase 1
+  frontend/src/pages/rm/NextActions.jsx              Created Phase 1
+  frontend/src/pages/rm/FinancialPlanView.jsx        Created Phase 1
+  frontend/src/pages/compliance/AuditLogView.jsx     Created Phase 1
+  frontend/src/pages/compliance/RiskAlertsView.jsx   Created Phase 1
+  frontend/src/pages/compliance/AIGovernanceView.jsx Created Phase 1
+  frontend/src/components/AppShell.jsx               Created Phase 1
+  frontend/package.json                              Created Phase 1, v0.4.0
+
+================================================================================
+SECTION 8 — PENDING WORK (PHASE 5 ONWARDS)
+================================================================================
+
+PHASE 5 — ChromaDB RAG Pipeline (v0.5.0)
+  [ ] Install Microsoft C++ Build Tools (required for chromadb on Windows)
+  [ ] Uncomment chromadb + sentence-transformers in requirements.txt
+  [ ] backend/app/rag/embedder.py — embed knowledge docs into ChromaDB
+  [ ] backend/app/rag/retriever.py — semantic search at query time
+  [ ] backend/app/rag/knowledge_docs/ — SEBI IA regs, MF basics, tax guide (text)
+  [ ] Wire RAG retrieval into streaming.py (inject chunks into system prompt)
+  [ ] make rag-index / CLI command to seed ChromaDB
+
+PHASE 6 — End-to-End Live Testing (v0.6.0)
+  [ ] Set ANTHROPIC_API_KEY in backend/.env
+  [ ] Test all 5 tools end-to-end through /api/chat/message
+  [ ] Verify SSE streaming in frontend ChatView
+  [ ] Verify ChatMessage + AIAuditLog persistence after chat
+  [ ] Fix any edge cases (empty portfolio, missing goals, etc.)
+
+PHASE 7 — RM Copilot Full Implementation (v0.7.0)
+  [ ] GET /api/rm/next-actions — query alerts + compute prioritised action list
+  [ ] GET /api/rm/meeting-prep/{clientId} — AI-generated meeting brief (Claude)
+  [ ] POST /api/financial-plan/generate — Claude-generated full financial plan
+  [ ] GET /api/financial-plan/{clientId} — retrieve saved plan
+  [ ] Wire frontend: rm/NextActions.jsx, rm/FinancialPlanView.jsx
+
+PHASE 8 — Compliance Dashboard Full Implementation (v0.8.0)
+  [ ] GET /api/compliance/audit-log — paginated AIAuditLog query with filters
+  [ ] GET /api/compliance/risk-alerts — query alerts table with priority filter
+  [ ] POST /api/compliance/generate-doc — SEBI disclosure document generator
+  [ ] GET /api/compliance/ai-governance — confidence score stats, tool usage
+  [ ] Wire frontend: AuditLogView, RiskAlertsView, AIGovernanceView
+
+PHASE 9 — Frontend Polish (v0.9.0)
+  [ ] Investor: wire PortfolioOverview with real /api/me/portfolio data
+  [ ] Investor: wire GoalsView with feasibility scores + progress bars
+  [ ] Investor: wire TaxView with regime comparison + LTCG section
+  [ ] Investor: wire ChatView with SSE streaming (delta events → streaming text)
+  [ ] Investor: show tool_call events (e.g. "Checking your portfolio...")
+  [ ] Investor: show confidence score + disclaimer in chat
+  [ ] RM: wire ClientList with AUM, XIRR, alert count
+  [ ] RM: wire ClientDetail with tabs (portfolio, goals, chat, tax)
+  [ ] Compliance: wire all 3 dashboard views
+  [ ] Loading states, error boundaries, empty states throughout
+  [ ] Mobile-responsive layout review
+
+PHASE 10 — Demo Prep (v1.0.0)
+  [ ] Enrich seed data (larger portfolios, more realistic values)
+  [ ] End-to-end demo script walkthrough
+  [ ] Fix any remaining broken flows
+  [ ] Record demo video / prepare slides
+  [ ] Final README review
+
+================================================================================
+END OF LOG — v0.4.0
+================================================================================

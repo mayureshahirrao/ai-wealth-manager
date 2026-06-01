@@ -10,7 +10,8 @@ export default function RiskAlertsView() {
   if (isLoading) return <LoadingSpinner size="page" />;
   if (error)     return <div className="p-8 text-red-600">Failed to load alerts.</div>;
 
-  const alerts = data?.data || [];
+  const alerts = data?.data?.alerts || [];
+  const summary = data?.data?.summary || {};
 
   return (
     <div className="p-6 space-y-4">

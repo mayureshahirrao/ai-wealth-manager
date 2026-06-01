@@ -10,7 +10,8 @@ export default function AuditLogView() {
   if (isLoading) return <LoadingSpinner size="page" label="Loading audit log..." />;
   if (error)     return <div className="p-8 text-red-600">Failed to load audit log.</div>;
 
-  const logs = data?.data || [];
+  const logs = data?.data?.logs || [];
+  const pagination = data?.data?.pagination || {};
 
   return (
     <div className="p-6 space-y-4">
@@ -38,7 +39,7 @@ export default function AuditLogView() {
               {logs.map((log) => (
                 <tr key={log.log_id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 text-gray-500 whitespace-nowrap text-xs">{formatDate(log.created_at)}</td>
-                  <td className="px-4 py-3 text-gray-600 font-mono text-xs">{log.client_id?.slice(0, 8)}...</td>
+                  <td className="px-4 py-3 text-gray-600 text-xs">{log.client_name || log.client_id?.slice(0, 8)}</td>
                   <td className="px-4 py-3">
                     <span className="bg-blue-50 text-blue-700 text-xs px-2 py-0.5 rounded">{log.tool_name}</span>
                   </td>

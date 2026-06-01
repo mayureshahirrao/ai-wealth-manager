@@ -1,6 +1,6 @@
 # AI Wealth Manager — India 🇮🇳
 
-> **Version 0.7.0** · [Changelog](CHANGELOG.md)
+> **Version 0.7.1** · [Changelog](CHANGELOG.md)
 
 An AI-powered robo-advisor platform for the Indian market, built with **Claude Sonnet** as the reasoning engine. Covers portfolio analysis, goal planning, tax optimisation (Budget 2024), and retirement projections — all within SEBI (Investment Advisers) Regulations, 2013 compliance.
 
@@ -299,6 +299,7 @@ The project version is maintained in three places (always kept in sync):
 | 0.5.0 | Phase 5 | ChromaDB RAG pipeline — 162 chunks, 5 knowledge docs |
 | 0.6.0 | Phase 7 | RM Copilot — next actions, meeting prep, financial plan |
 | 0.7.0 | Phase 8 | Compliance dashboard — audit log, risk alerts, SEBI docs, AI governance |
+| 0.7.1 | Bugfix | Goals view broken + AI chat SSE error (cp1252 + empty API key) |
 | 0.8.0 | Phase 9 | Frontend polish *(planned)* |
 | 1.0.0 | Phase 10 | Demo-ready release *(planned)* |
 

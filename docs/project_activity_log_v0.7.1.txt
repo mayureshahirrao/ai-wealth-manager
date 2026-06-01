@@ -1,0 +1,189 @@
+================================================================================
+AI WEALTH MANAGER — PROJECT ACTIVITY LOG v0.7.1
+Generated: 2026-06-01
+================================================================================
+
+SECTION 1-7 — Prior Phases
+--------------------------------------------------------------------------------
+See: docs/project_activity_log_v0.7.0.txt
+Covers: Phases 1–8 (v0.1.0 → v0.7.0)
+  v0.1.0  Phase 1: Foundation scaffold
+  v0.2.0  Phase 2: Financial engine + data layer
+  v0.3.0  Phase 3+4: Claude integration + 5 AI tools + SSE streaming
+  v0.4.0  Bugfix: Windows compatibility, dependency pins
+  v0.5.0  Phase 5: ChromaDB RAG pipeline
+  v0.6.0  Phase 7: RM Copilot (next-actions, meeting-prep, financial plan)
+  v0.7.0  Phase 8: Compliance module (5 endpoints + full compliance dashboard)
+
+SECTION 8 — Phase 10 Demo Prep + Critical Bug Fixes (v0.7.1)
+================================================================================
+
+8.1  User Instructions (verbatim)
+--------------------------------------------------------------------------------
+[Turn 1] "go ahead with next phase"
+  → Claude started Phase 10 demo prep: Docker up, migrations, seed, backend start,
+    health check, all 3 role login tests, compliance endpoints, Swagger check.
+
+[Turn 2] "there are 2 critical bugs:
+  1. The Goals section is not working
+  2. I am getting this error while trying out the AI chat API:
+     data: {"type": "error", "message": "An error occurred while processing your
+     request. Please try again."}"
+
+[Turn 3] "now tell me exactly what was the issue, and what you fixed in every
+step. Use fewer tokens and use tabular format"
+  → Claude produced tabular root-cause/fix summary.
+
+[Turn 4] "/phase-complete" → this log.
+
+8.2  Recommendations & Decisions
+--------------------------------------------------------------------------------
+Decision: Phase 10 demo prep ran before bugs were discovered.
+  → Health check, seed verify, RAG index, login tests all passed first.
+  → Bugs found during live API testing.
+
+Decision: Chat bug diagnosis required 3 iterations.
+  1. First suspected wrong field name (message vs query) — wrong, validation error
+     was from test payload, not root cause.
+  2. Then found correct payload still errored — needed actual exception text.
+  3. Added debug logging to streaming.py → found tool_execution_failed with
+     UnicodeEncodeError on ₹ symbol.
+  4. Separately found ANTHROPIC_API_KEY empty in backend config — pydantic-settings
+     env var priority bug.
+
+Decision: env_ignore_empty=True chosen over other approaches.
+  Alternatives considered:
+  - Set ANTHROPIC_API_KEY as system env var permanently → fragile, machine-specific
+  - Pass key explicitly to uvicorn subprocess → works but manual each session
+  - env_ignore_empty=True in config → proper fix, works always, no manual steps
+
+Decision: ASCII encode tool summaries (not full result).
+  Only `input_summary` and `output_summary` strings (for logging only) get encoded.
+  The actual tool result dict passed to Claude is unchanged — ₹ symbol preserved
+  in JSON response to Claude (JSON handles Unicode natively).
+
+8.3  Actions Performed
+--------------------------------------------------------------------------------
+Phase 10 Demo Prep verification (no file changes):
+  - docker compose up -d postgres chromadb → both healthy
+  - alembic upgrade head → at head (001)
+  - seed_data.py → UniqueViolationError (already seeded, expected)
+  - python -m app.rag.index → 5 docs, 162 chunks indexed
+  - GET /health → {"status":"ok","version":"0.7.0"}
+  - Login test: investor/rm/compliance → all 3 JWTs issued
+  - GET /api/me/portfolio → AUM ₹31.8L, XIRR 13.2%, 3 holdings
+  - GET /api/rm/next-actions → 8 actions across 5 clients
+  - GET /api/compliance/audit-log → 5 entries
+  - GET /api/compliance/risk-alerts → 2 alerts (Sunita Rao, Arjun Kapoor) with client_name
+  - GET /api/compliance/ai-governance → 5 interactions, 100% compliant, avg conf 0.81
+  - GET /openapi.json → 31 endpoints documented
+
+Additional fixes found during demo prep (committed in v0.7.0 session):
+  - AuditLogView: data.data.logs (not data.data)
+  - RiskAlertsView: data.data.alerts (not data.data), client_name shown
+
+Bug Fix 1 — GoalsView (frontend/src/pages/investor/GoalsView.jsx):
+  Problem: data?.data || [] gets object {goals:[], retirement_readiness:{}}
+           → goals.map() fails silently, nothing renders
+  Problem: goal.progress_pct undefined → progress bar = 0
+  Problem: goal.target_year undefined → "Target: undefined"
+  Fix: data?.data?.goals || []
+  Fix: goal.feasibility_score for progressPct
+  Fix: new Date().getFullYear() + goal.years_remaining for targetYear
+
+Bug Fix 2a — config.py (backend/app/core/config.py):
+  Problem: Claude Code sets ANTHROPIC_API_KEY='' in system environment.
+           pydantic-settings v2 reads env vars before .env file.
+           Empty string IS a value → overrides .env → API key blank in backend.
+  Fix: env_ignore_empty=True in SettingsConfigDict → empty env vars ignored,
+       falls through to .env value.
+
+Bug Fix 2b — base_tool.py (backend/app/ai/base_tool.py):
+  Problem: log_ai_call() receives str(result) containing ₹ (U+20B9).
+           structlog writes to Windows console (cp1252 encoding).
+           cp1252 cannot encode ₹ → UnicodeEncodeError.
+           BaseTool.__call__ catches Exception → raises AIToolExecutionError.
+           streaming.py catches AIToolExecutionError → yields SSE error event.
+  Fix: .encode('ascii','replace').decode('ascii') on input_summary + output_summary.
+       Replaces ₹ with '?' in log strings only. Tool result to Claude unchanged.
+
+Diagnosis steps (no code changes):
+  - Tested chat with correct payload → same SSE error
+  - Added debug f-string to streaming.py error event → error message didn't change
+    → discovered old zombie processes holding port 8000
+  - Killed PIDs 39072, 60832 (multiprocessing workers of dead parent)
+  - Restarted uvicorn with --reload
+  - Direct Python test of stream_chat_response → confirmed UnicodeEncodeError
+  - Direct Python test of config → confirmed ANTHROPIC_API_KEY empty with env var set
+  - Applied both fixes → chat SSE stream working end-to-end
+
+8.4  Testing & Verification
+--------------------------------------------------------------------------------
+AI Chat (after fixes):
+  POST /api/chat/message → full SSE stream:
+    data: {"type":"delta","text":"Let me fetch your portfolio details..."}
+    data: {"type":"tool_call","tool":"get_portfolio_summary",...}
+    data: {"type":"tool_result","tool":"get_portfolio_summary","result":{...full portfolio...}}
+    data: {"type":"delta","text":"## Portfolio Summary\n..."} (full markdown response)
+    data: {"type":"delta","text":"...SEBI disclaimer..."}
+    data: {"type":"done","confidence":0.72,"tools_used":["get_portfolio_summary"],
+           "rag_sources":3,"compliant":true,"duration_ms":21955}
+
+Frontend (GoalsView):
+  - Zero console errors in preview ✅
+  - HMR confirmed active ✅
+
+Config fix:
+  python -c "s = Settings(); print(bool(s.ANTHROPIC_API_KEY))" → True (was False) ✅
+
+8.5  Deliverables
+--------------------------------------------------------------------------------
+Files modified:
+  backend/app/core/config.py     env_ignore_empty=True added
+  backend/app/ai/base_tool.py    ASCII encode log summaries
+  frontend/src/pages/investor/GoalsView.jsx  3 field fixes
+
+Documentation:
+  VERSION: 0.7.0 → 0.7.1
+  backend/app/core/config.py: APP_VERSION 0.7.0 → 0.7.1
+  frontend/package.json: version 0.7.0 → 0.7.1
+  CHANGELOG.md: v0.7.1 entry added
+  README.md: version badge updated, versioning table row added
+  docs/project_activity_log_v0.7.1.txt: this file
+
+SECTION 9 — Artifacts Index (cumulative)
+================================================================================
+See: docs/project_activity_log_v0.7.0.txt (Section 6) for full list.
+New/modified in v0.7.1:
+  backend/app/core/config.py           env_ignore_empty=True
+  backend/app/ai/base_tool.py          ASCII encode logging summaries
+  frontend/src/pages/investor/GoalsView.jsx  goals array + field fixes
+  VERSION                              0.7.1
+  CHANGELOG.md                         v0.7.1 entry
+  README.md                            version badge + table
+  docs/project_activity_log_v0.7.1.txt this file
+
+SECTION 10 — Pending Work
+================================================================================
+
+Phase 10 remaining:
+  [ ] Full end-to-end browser test (investor → portfolio, goals, chat, tax)
+  [ ] RM full flow (client list → detail → meeting prep → financial plan)
+  [ ] Compliance full flow (audit log → risk alerts → AI governance → doc generator)
+  [ ] Resolve-alert UI (PATCH endpoint exists, no frontend button yet)
+  [ ] RAG cp1252 fix — index.py print() has ✅ emoji causing cosmetic crash on Windows
+  [ ] Docker clean build from scratch (docker system prune + up --build)
+  [ ] LangSmith trace review (if LANGCHAIN_API_KEY configured)
+  [ ] Remove --reload flag from uvicorn for production-like demo
+
+Known remaining issues:
+  [ ] format_inr() produces ₹ in formatted strings — downstream Windows console
+      logging issues may surface in other tools (get_goal_progress, calculate_tax_liability,
+      run_retirement_projection) — same ASCII encode fix may be needed if those tools log
+      formatted strings via log_ai_call (they inherit from BaseTool so should be fixed)
+  [ ] useSSE hook in ChatView.jsx — verify streaming SSE events correctly parsed
+      (tool_call, tool_result, delta, done all need UI handling)
+
+================================================================================
+END OF LOG v0.7.1
+================================================================================

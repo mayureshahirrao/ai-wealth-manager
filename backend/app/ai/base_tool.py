@@ -70,8 +70,8 @@ class BaseTool(ABC):
             log_ai_call(
                 tool_name=self.name,
                 client_id=client_id or "N/A",
-                input_summary=str(kwargs)[:200],
-                output_summary=str(result)[:200],
+                input_summary=str(kwargs)[:200].encode("ascii", "replace").decode("ascii"),
+                output_summary=str(result)[:200].encode("ascii", "replace").decode("ascii"),
                 duration_ms=duration_ms,
             )
             logger.debug("tool_execution_success", tool=self.name, call_id=call_id, duration_ms=duration_ms)

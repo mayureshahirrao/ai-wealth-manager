@@ -12,11 +12,12 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore",
+        env_ignore_empty=True,
     )
 
     APP_NAME: str = "AI Wealth Manager"
     APP_ENV: str = "development"
-    APP_VERSION: str = "0.7.0"
+    APP_VERSION: str = "0.7.1"
     DEBUG: bool = True
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
 

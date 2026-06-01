@@ -11,6 +11,37 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [0.7.1] — 2026-06-01
+
+### Fixed — Phase 10: Critical Bug Fixes (Demo Prep)
+
+#### `backend/app/core/config.py`
+- Added `env_ignore_empty=True` to `SettingsConfigDict` — pydantic-settings now ignores
+  empty system env vars (e.g. `ANTHROPIC_API_KEY=''` set by Claude Code process) and falls
+  through to `.env` file value. Previously the empty system env overrode `.env`, causing
+  `ANTHROPIC_API_KEY` to be blank in all backend processes.
+
+#### `backend/app/ai/base_tool.py`
+- `log_ai_call()` input/output summaries now ASCII-encoded (`encode('ascii','replace')`) before
+  logging. Tool results contain `₹` (U+20B9 Rupee sign) which crashed structlog on Windows
+  cp1252 console, raising `AIToolExecutionError` and surfacing as generic SSE error.
+
+#### `frontend/src/pages/investor/GoalsView.jsx`
+- Fixed: `data?.data` was object `{goals:[], retirement_readiness:{}}` not array —
+  changed to `data?.data?.goals || []`
+- Fixed: `goal.progress_pct` (field missing in API response) — replaced with `goal.feasibility_score`
+- Fixed: `goal.target_year` (field missing in API response) — derived as
+  `new Date().getFullYear() + goal.years_remaining`
+
+### Verified Working
+- AI chat SSE stream ✅ — tool called → data fetched → response streamed → SEBI disclaimer → done event (confidence=0.72)
+- Goals view renders ✅ — feasibility scores, target years, progress bars all correct
+- All 31 API endpoints documented in Swagger ✅
+- All 3 role login flows ✅ — investor, RM, compliance
+- RAG index ✅ — 162 chunks, 5 docs
+
+---
+
 ## [0.7.0] — 2026-06-01
 
 ### Added — Phase 8: Compliance Module Full Implementation

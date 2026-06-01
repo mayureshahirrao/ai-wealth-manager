@@ -13,7 +13,8 @@ export default function GoalsView() {
   if (isLoading) return <LoadingSpinner size="page" label="Loading goals..." />;
   if (error)     return <div className="p-8 text-red-600">Failed to load goals.</div>;
 
-  const goals = data?.data || [];
+  const goals = data?.data?.goals || [];
+  const retirementReadiness = data?.data?.retirement_readiness || null;
   const barData = goalsToBarData(goals);
 
   return (
@@ -31,7 +32,8 @@ export default function GoalsView() {
         {goals.map((goal) => {
           const feasibility = formatFeasibilityScore(goal.feasibility_score || 50);
           const icon = GOAL_ICONS[goal.goal_type] || '🎯';
-          const progressPct = Math.min(goal.progress_pct || 0, 100);
+          const progressPct = Math.min(goal.feasibility_score || 0, 100);
+          const targetYear = new Date().getFullYear() + (goal.years_remaining || 0);
 
           return (
             <div key={goal.goal_id} className="card">
@@ -40,7 +42,7 @@ export default function GoalsView() {
                   <span className="text-2xl">{icon}</span>
                   <div>
                     <p className="font-semibold text-gray-900">{goal.goal_name}</p>
-                    <p className="text-xs text-gray-500 capitalize">{goal.goal_type.replace('_', ' ')} · Target: {goal.target_year}</p>
+                    <p className="text-xs text-gray-500 capitalize">{goal.goal_type.replace('_', ' ')} · Target: {targetYear} ({goal.years_remaining}yr)</p>
                   </div>
                 </div>
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${feasibility.bg} ${feasibility.color}`}>

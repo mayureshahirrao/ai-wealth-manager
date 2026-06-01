@@ -1,6 +1,6 @@
 # AI Wealth Manager — India 🇮🇳
 
-> **Version 0.5.0** · [Changelog](CHANGELOG.md)
+> **Version 0.6.0** · [Changelog](CHANGELOG.md)
 
 An AI-powered robo-advisor platform for the Indian market, built with **Claude Sonnet** as the reasoning engine. Covers portfolio analysis, goal planning, tax optimisation (Budget 2024), and retirement projections — all within SEBI (Investment Advisers) Regulations, 2013 compliance.
 
@@ -55,8 +55,8 @@ An AI-powered robo-advisor platform for the Indian market, built with **Claude S
 | 2 | Financial engine — XIRR, tax calc, goal engine, data layer | ✅ Done |
 | 3+4 | Claude integration — 5 tools, SSE streaming, SEBI compliance | ✅ Done |
 | 5 | ChromaDB RAG — Indian financial knowledge retrieval | ✅ Done |
-| 6 | End-to-end testing with live Anthropic API key | 🔜 Next |
-| 7 | RM Copilot — meeting prep, next actions, financial plan | 🔜 Next |
+| 6 | RM Copilot — next actions, meeting prep, financial plan | ✅ Done |
+| 7 | Compliance dashboard — full audit log, SEBI doc generation | 🔜 Next |
 | 8 | Compliance dashboard — full audit log, SEBI doc generation | 🔜 Next |
 | 9 | Frontend polish — all dashboards fully wired | 🔜 Next |
 | 10 | Demo prep | 🔜 Next |
@@ -291,6 +291,7 @@ The project version is maintained in three places (always kept in sync):
 | 0.3.0 | Phase 3+4 | Claude integration + 5 AI tools + SSE streaming |
 | 0.4.0 | Bugfix | Windows compatibility, dependency fixes, migration stability |
 | 0.5.0 | Phase 5 | ChromaDB RAG pipeline — 162 chunks, 5 knowledge docs |
+| 0.6.0 | Phase 6 | RM Copilot — next actions, meeting prep, financial plan |
 | 0.6.0 | Phase 6 | End-to-end live testing *(planned)* |
 | 0.7.0 | Phase 7 | RM Copilot full implementation *(planned)* |
 | 0.8.0 | Phase 8 | Compliance dashboard full implementation *(planned)* |

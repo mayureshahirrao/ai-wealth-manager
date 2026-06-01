@@ -16,7 +16,7 @@ class Settings(BaseSettings):
 
     APP_NAME: str = "AI Wealth Manager"
     APP_ENV: str = "development"
-    APP_VERSION: str = "0.5.0"
+    APP_VERSION: str = "0.6.0"
     DEBUG: bool = True
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
 

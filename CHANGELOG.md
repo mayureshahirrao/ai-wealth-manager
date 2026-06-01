@@ -11,6 +11,66 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [0.6.0] — 2026-05-31
+
+### Added — Phase 6: RM Copilot Full Implementation
+
+#### `backend/app/api/rm.py` (full rewrite of stub)
+- `GET /api/rm/next-actions` — prioritised action queue across ALL clients:
+  - Sources: active compliance alerts, auto-detected overdue reviews (90+ days),
+    at-risk goals (feasibility score < 40)
+  - Sorted by priority (critical → high → medium → low), then client name
+  - Each action includes `recommended_action` string mapped from alert type
+  - Returns `total_actions`, `generated_at` timestamp
+- `GET /api/rm/meeting-prep/{client_id}` — AI-generated meeting brief:
+  - Gathers: client profile, portfolio (XIRR, allocation, holdings), goals (GoalAssessment),
+    active alerts
+  - Calls `claude.complete()` with structured 7-section prompt
+  - Returns: brief text, context_summary (AUM, alert count, goal count), generated_at
+- `GET /api/rm/alerts/{client_id}` — enriched (adds `recommended_action` per alert)
+- Helper `_get_recommended_action()` — maps AlertType → actionable recommendation string
+- Helper `_build_meeting_context()` — formats client data into Claude-readable brief
+- `require_rm_or_compliance` guard on all RM endpoints (compliance can view too)
+
+#### `backend/app/api/financial_plan.py` (full rewrite of stub)
+- `POST /api/financial-plan/generate` — AI comprehensive financial plan:
+  - Request body: `{client_id, advisor_notes?, target_retirement_age, desired_monthly_income}`
+  - Gathers full client data: portfolio, holdings, goals (GoalAssessment for each),
+    tax regime comparison, active alerts
+  - Calls `claude.complete()` with 8-section structured prompt (system prompt as SEBI RA)
+  - Saves to `compliance_documents` table (SUITABILITY_ATTESTATION type) for audit trail
+  - Returns: plan text, plan_id, tokens_used, generated_by
+- `GET /api/financial-plan/{client_id}` — retrieves most recent saved plan from DB
+- Helper `_build_plan_context()` — comprehensive context with portfolio, goals, tax analysis
+- `GeneratePlanRequest` Pydantic model with validation
+
+#### `frontend/src/pages/rm/NextActions.jsx` (full rewrite)
+- Priority filter chips (All, Critical, High, Medium, Low) with counts
+- Action cards with emoji icons per action type, priority colour coding
+- "View Client →" navigation to ClientDetail
+- Refresh button, empty state ("All clients in good standing")
+
+#### `frontend/src/pages/rm/FinancialPlanView.jsx` (full rewrite)
+- Client selector dropdown populated from `/api/clients`
+- Parameters: retirement age, desired monthly income, advisor notes
+- "Generate Financial Plan" button with loading state (~30-60s warning)
+- Plan rendered as pre-formatted text with download button
+- Shows existing saved plan on load
+
+#### `frontend/src/pages/rm/ClientDetail.jsx` (major update)
+- Added tab navigation: Overview | Portfolio | Goals | Meeting Prep
+- **Overview tab**: client details + portfolio snapshot
+- **Portfolio tab**: holdings table with gain/loss %, asset allocation
+- **Goals tab**: feasibility progress bars with colour coding
+- **Meeting Prep tab**: "Generate Meeting Brief" button → streaming Claude response
+- Alerts banner with `recommended_action` shown below each alert
+
+#### `frontend/src/hooks/useApi.js`
+- `useMeetingPrep()` — `enabled` param (only fetches on demand)
+- `useGenerateMeetingPrep()` — mutation for triggering meeting brief generation
+
+---
+
 ## [0.5.0] — 2026-05-31
 
 ### Added — Phase 5: ChromaDB RAG Pipeline

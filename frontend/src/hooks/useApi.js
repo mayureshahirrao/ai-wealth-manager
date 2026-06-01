@@ -215,12 +215,12 @@ export function useNextActions() {
   });
 }
 
-export function useMeetingPrep(clientId) {
+export function useMeetingPrep(clientId, enabled = false) {
   return useQuery({
     queryKey: queryKeys.meetingPrep(clientId),
     queryFn: () => apiClient.get(ENDPOINTS.RM.MEETING_PREP(clientId)),
-    enabled: !!clientId,
-    ...STATIC_QUERY_CONFIG,
+    enabled: !!clientId && enabled,   // Only fetch when explicitly triggered
+    staleTime: 5 * 60 * 1000,        // 5 minutes — meeting briefs don't change often
   });
 }
 
@@ -250,6 +250,16 @@ export function useGenerateFinancialPlan() {
     mutationFn: (payload) => apiClient.post(ENDPOINTS.FINANCIAL_PLAN.GENERATE, payload),
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.financialPlan(variables.client_id) });
+    },
+  });
+}
+
+export function useGenerateMeetingPrep(clientId) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => apiClient.get(ENDPOINTS.RM.MEETING_PREP(clientId)),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.meetingPrep(clientId) });
     },
   });
 }

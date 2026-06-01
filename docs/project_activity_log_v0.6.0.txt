@@ -1,0 +1,275 @@
+================================================================================
+AI WEALTH MANAGER — COMPLETE PROJECT ACTIVITY LOG
+Version: 0.6.0
+Generated: 2026-05-31
+Covers: Phase 1 through Phase 6
+================================================================================
+
+Prior phase detail is fully documented in:
+  docs/project_activity_log_v0.4.0.txt  — Phases 1–4 + v0.4.0 bugfixes
+  docs/project_activity_log_v0.5.0.txt  — Phase 5 (ChromaDB RAG)
+
+This file documents Phase 6 in full and references prior logs for history.
+
+--------------------------------------------------------------------------------
+TABLE OF CONTENTS
+--------------------------------------------------------------------------------
+  SECTIONS 1–7   — See project_activity_log_v0.5.0.txt
+  SECTION 8      — Phase 6: RM Copilot Full Implementation (v0.6.0) ← NEW
+  SECTION 9      — Artifacts Index (cumulative through v0.6.0)
+  SECTION 10     — Pending Work (Phase 7 onwards)
+
+================================================================================
+SECTION 8 — PHASE 6: RM COPILOT FULL IMPLEMENTATION (v0.6.0)
+================================================================================
+
+--------------------------------------------------------------------------------
+8.1  INSTRUCTION
+--------------------------------------------------------------------------------
+
+USER: "start"
+  Context: Phase 6 action plan had been listed at the end of the v0.5.0 log.
+  Implicit: begin implementing Phase 6 — RM Copilot.
+
+--------------------------------------------------------------------------------
+8.2  DECISIONS & ARCHITECTURE
+--------------------------------------------------------------------------------
+
+DECISION: next-actions data sources
+  Options considered:
+    A) Only query the alerts table
+    B) Alerts + overdue review detection + at-risk goal analysis
+  CHOSEN: Option B — three-source approach gives richer, more actionable output
+  Implementation:
+    - Alerts table: active (is_resolved=False) compliance alerts
+    - Auto-detected: clients with last_review_date > 90 days or null
+    - Goal analysis: GoalAssessment run for each goal; flag if feasibility < 40
+    - De-duplication: skip auto-detected REVIEW_OVERDUE if already in alerts
+
+DECISION: meeting-prep approach
+  Options considered:
+    A) Return structured data (portfolio + goals as JSON)
+    B) AI-generated natural language brief via Claude
+  CHOSEN: Option B — provides immediately usable content for RM; demonstrates
+          Claude's synthesis capability; data already available in AI tools
+  Implementation: claude.complete() (not streaming) with 7-section prompt;
+                  max_tokens=1500 to keep brief concise
+
+DECISION: financial-plan persistence
+  Question: Where to save generated plans?
+  Options:
+    A) New financial_plans DB table
+    B) Existing compliance_documents table (SUITABILITY_ATTESTATION type)
+  CHOSEN: Option B — reuses existing schema; plans are suitability documents
+          under SEBI IA Regulations (Clause 19 rationale); no migration needed
+  Lookup: GET /api/financial-plan/{client_id} retrieves most recent
+          SUITABILITY_ATTESTATION doc for that client
+
+DECISION: financial-plan prompt structure
+  Decided on 8 sections matching SEBI IA Regulations requirements:
+    1. Executive Summary
+    2. Portfolio Review (with XIRR vs benchmark)
+    3. Goal Roadmap (with GoalAssessment data)
+    4. Tax Optimisation Strategy (compare_tax_regimes())
+    5. Retirement Projection
+    6. Risk Assessment
+    7. Recommended Action Plan (with timeframes)
+    8. Important Disclosures (SEBI Clause 19 rationale)
+  System prompt: Claude acts as SEBI-registered investment adviser
+
+DECISION: require_rm_or_compliance guard
+  Compliance officers should be able to VIEW meeting preps and next actions
+  (for audit purposes), but only RMs can GENERATE financial plans.
+  Implementation: GET endpoints use require_rm_or_compliance;
+                  POST /generate uses require_rm only
+
+DECISION: ClientDetail tab structure
+  Added 4 tabs: Overview | Portfolio | Goals | Meeting Prep
+  Meeting Prep tab uses useMutation (not useQuery) — brief generated on demand,
+  not on page load (avoid unnecessary API calls + Claude costs)
+
+--------------------------------------------------------------------------------
+8.3  ACTIONS PERFORMED
+--------------------------------------------------------------------------------
+
+BACKEND — backend/app/api/rm.py (full rewrite):
+
+  GET /api/rm/next-actions:
+    - Query all clients with selectinload(alerts) + selectinload(goals)
+    - For each client:
+      * Iterate active alerts → build action dict with recommended_action
+      * Check last_review_date vs (today - 90 days) threshold → REVIEW_OVERDUE
+      * Run GoalAssessment for each goal → flag if feasibility_score < 40
+    - Sort by _PRIORITY_ORDER dict (critical=0, high=1, medium=2, low=3)
+    - Strip internal sort key before returning
+    - Returns: {total_actions, actions[], generated_at}
+
+  GET /api/rm/meeting-prep/{client_id}:
+    - Validates UUID, fetches Client with goals + alerts via selectinload
+    - Fetches Portfolio + Holdings separately
+    - Calls _build_meeting_context() → structured text with all client data
+    - Calls claude.complete() with 7-section prompt
+    - Returns: {client_id, client_name, brief, generated_at, context_summary}
+    - Logs: client_id, output_tokens
+
+  Helper _get_recommended_action(alert_type):
+    - Dict mapping AlertType → human-readable recommended action string
+    - 10 alert types covered + default fallback
+
+  Helper _build_meeting_context(client, portfolio):
+    - CLIENT section: name, age, risk profile, income, tax regime, KYC
+    - PORTFOLIO section: AUM, gain%, XIRR vs benchmark, allocation by asset class
+    - GOALS section: each goal with GoalAssessment (feasibility, status, shortfall)
+    - ACTIVE ALERTS section: priority + message for each unresolved alert
+
+  GET /api/rm/alerts/{client_id}:
+    - Enriched with recommended_action field
+    - UUID validation added
+    - Changed guard from require_rm to require_rm_or_compliance
+
+BACKEND — backend/app/api/financial_plan.py (full rewrite):
+
+  POST /api/financial-plan/generate:
+    - GeneratePlanRequest model: {client_id, advisor_notes, target_retirement_age,
+      desired_monthly_income}
+    - Fetches Client (goals + alerts), Portfolio (holdings)
+    - Calls _build_plan_context() → comprehensive ~50-line context string including:
+      * Client profile
+      * Portfolio: AUM, XIRR, allocation, all holdings with gain%
+      * Goals: each with GoalAssessment (feasibility, shortfall, SIP)
+      * Tax: compare_tax_regimes() → recommended regime + savings
+      * Alerts: all active
+    - Calls claude.complete(max_tokens=3000, temperature=0.1)
+    - Saves ComplianceDocument (SUITABILITY_ATTESTATION) to DB
+    - Returns: {client_name, plan_id, plan, generated_at, generated_by, tokens_used}
+
+  GET /api/financial-plan/{client_id}:
+    - Queries ComplianceDocument WHERE client_id + doc_type=SUITABILITY_ATTESTATION
+    - ORDER BY created_at DESC LIMIT 1 (most recent plan)
+    - Returns plan text + metadata, or helpful message if no plan exists
+
+  Helper _build_plan_context(client, portfolio, payload):
+    - Structured with === section headers
+    - Includes all client data + tax comparison + allocation + per-holding data
+
+FRONTEND — frontend/src/pages/rm/NextActions.jsx (full rewrite):
+  - Priority filter chips (All, Critical, High, Medium, Low) with live counts
+  - Action cards: emoji icon per action_type, priority colour band, client name,
+    message, recommended_action (italic), "View Client →" link
+  - Refresh button + generated_at timestamp display
+  - Empty state: "✅ All clients are in good standing"
+  - Error state with retry button
+
+FRONTEND — frontend/src/pages/rm/FinancialPlanView.jsx (full rewrite):
+  - Client selector (populated from useClients)
+  - Inputs: retirement age (50-80), desired monthly income (₹), advisor notes
+  - "Generate Financial Plan" button → useGenerateFinancialPlan mutation
+  - Loading state: "Claude is analysing the client's full financial picture... (~30-60s)"
+  - Plan display: pre-formatted text + download button (saves as .txt)
+  - Loads existing saved plan on client selection via useFinancialPlan
+  - tokens_used shown in footer
+
+FRONTEND — frontend/src/pages/rm/ClientDetail.jsx (major update):
+  - Tab bar: Overview | Portfolio | Goals | Meeting Prep
+  - Overview: client details + portfolio snapshot cards
+  - Portfolio: metric cards + holdings table (scheme, class, value, gain%)
+  - Goals: feasibility progress bars, colour-coded (green/blue/amber/red)
+    + SIP/corpus/target grid per goal
+  - Meeting Prep: "Generate Meeting Brief" → useGenerateMeetingPrep mutation
+    → shows brief text + context_summary (AUM, alerts, goals)
+    → "Regenerate Brief" button after first generation
+  - Alerts banner: each alert now shows recommended_action below message
+
+FRONTEND — frontend/src/hooks/useApi.js:
+  - useMeetingPrep(clientId, enabled=false) — only fetches on demand
+  - useGenerateMeetingPrep(clientId) — mutation for on-demand brief generation
+
+--------------------------------------------------------------------------------
+8.4  TESTING APPROACH
+--------------------------------------------------------------------------------
+
+Testing can be done via:
+
+1. Swagger UI (http://localhost:8000/docs):
+   - Login as rm@wealthmanager.com / demo1234
+   - GET /api/rm/next-actions → expect actions for Sunita (REVIEW_OVERDUE)
+     and Arjun (CONCENTRATION_RISK) from seed data
+   - GET /api/rm/meeting-prep/{priya_client_id} → Claude-generated brief
+   - POST /api/financial-plan/generate with valid client_id → full plan text
+
+2. Frontend (http://localhost:3000):
+   - Login as RM → navigate to "Next Actions" → verify action list
+   - Click any client → verify tabs (Overview, Portfolio, Goals, Meeting Prep)
+   - Meeting Prep tab → "Generate Meeting Brief" → verify AI output
+   - "Financial Plans" sidebar item → select client → generate plan
+
+Expected seed data actions:
+  HIGH: Sunita Rao — REVIEW_OVERDUE (120 days, from seed alert)
+  MEDIUM: Arjun Kapoor — CONCENTRATION_RISK (equity 68%)
+
+--------------------------------------------------------------------------------
+8.5  DELIVERABLES
+--------------------------------------------------------------------------------
+  - GET /api/rm/next-actions — live, 3-source prioritised action queue
+  - GET /api/rm/meeting-prep/{id} — Claude AI meeting brief (7 sections)
+  - POST /api/financial-plan/generate — Claude 8-section financial plan (saved to DB)
+  - GET /api/financial-plan/{id} — retrieve saved plan
+  - Frontend: NextActions.jsx — priority-filtered action board
+  - Frontend: FinancialPlanView.jsx — plan generator with download
+  - Frontend: ClientDetail.jsx — 4-tab view with meeting prep AI generation
+  - Version: 0.6.0
+
+================================================================================
+SECTION 9 — ARTIFACTS INDEX (CUMULATIVE THROUGH v0.6.0)
+================================================================================
+
+[All files from v0.5.0 log retained; additions listed below]
+
+BACKEND — API (modified in Phase 6):
+  backend/app/api/rm.py               Created P1 (stub), full rewrite v0.6.0
+  backend/app/api/financial_plan.py   Created P1 (stub), full rewrite v0.6.0
+
+BACKEND — Other (modified in Phase 6):
+  backend/app/core/config.py          APP_VERSION → 0.6.0
+
+FRONTEND (modified in Phase 6):
+  frontend/src/hooks/useApi.js              Modified v0.6.0
+  frontend/src/pages/rm/NextActions.jsx     Full rewrite v0.6.0
+  frontend/src/pages/rm/FinancialPlanView.jsx  Full rewrite v0.6.0
+  frontend/src/pages/rm/ClientDetail.jsx    Major update v0.6.0
+
+DOCUMENTATION:
+  VERSION                                   0.5.0 → 0.6.0
+  CHANGELOG.md                              v0.6.0 entry added
+  README.md                                 Phase 6 marked Done; version 0.6.0
+  docs/project_activity_log_v0.6.0.txt      Created (this file)
+
+================================================================================
+SECTION 10 — PENDING WORK (PHASE 7 ONWARDS)
+================================================================================
+
+PHASE 7 — Compliance Dashboard Full Implementation (v0.7.0)
+  [ ] GET /api/compliance/audit-log — paginated AIAuditLog with date/client filters
+  [ ] GET /api/compliance/risk-alerts — all unresolved alerts across all clients
+  [ ] POST /api/compliance/generate-doc — SEBI disclosure document via Claude
+  [ ] GET /api/compliance/ai-governance — confidence stats, tool usage, compliance rate
+  [ ] Frontend: AuditLogView.jsx — table with filters + export
+  [ ] Frontend: RiskAlertsView.jsx — alert dashboard with resolve action
+  [ ] Frontend: AIGovernanceView.jsx — charts for confidence, tool usage, SEBI compliance
+
+PHASE 8 — Frontend Polish (v0.8.0)
+  [ ] Investor: PortfolioOverview — wire real data from /api/me/portfolio
+  [ ] Investor: GoalsView — feasibility bars, shortfall amounts
+  [ ] Investor: TaxView — regime comparison + LTCG harvesting section
+  [ ] Investor: ChatView — SSE streaming UI (tool call indicators, confidence badge)
+  [ ] Loading states, error boundaries, empty states throughout
+  [ ] Mobile-responsive layout review
+
+PHASE 9 — Demo Prep (v1.0.0)
+  [ ] Enrich seed data (larger portfolios, more realistic values)
+  [ ] Full demo script walkthrough
+  [ ] Final README review + video recording
+
+================================================================================
+END OF LOG — v0.6.0
+================================================================================

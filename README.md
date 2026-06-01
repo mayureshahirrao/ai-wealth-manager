@@ -1,6 +1,6 @@
 # AI Wealth Manager — India 🇮🇳
 
-> **Version 0.6.0** · [Changelog](CHANGELOG.md)
+> **Version 0.7.0** · [Changelog](CHANGELOG.md)
 
 An AI-powered robo-advisor platform for the Indian market, built with **Claude Sonnet** as the reasoning engine. Covers portfolio analysis, goal planning, tax optimisation (Budget 2024), and retirement projections — all within SEBI (Investment Advisers) Regulations, 2013 compliance.
 
@@ -22,7 +22,8 @@ An AI-powered robo-advisor platform for the Indian market, built with **Claude S
 ### For Compliance Officers
 - **SEBI Audit Trail** — every AI response logged to `ai_audit_logs` with confidence score and disclaimer flag
 - **Risk Alerts** — concentration risk, overdue reviews, KYC expiry
-- **AI Governance** — tool usage statistics, confidence distribution, compliance rate
+- **AI Governance** — tool usage stats, confidence distribution, SEBI compliance rate, daily trend, low-confidence escalation table
+- **SEBI Doc Generator** — AI-generated compliance docs: Disclosure, Risk Profile, Suitability, KYC, Meeting Summary
 
 ### AI Capabilities
 - 5 Claude tools: `get_portfolio_summary`, `get_goal_progress`, `calculate_tax_liability`, `get_market_data`, `run_retirement_projection`
@@ -56,10 +57,9 @@ An AI-powered robo-advisor platform for the Indian market, built with **Claude S
 | 3+4 | Claude integration — 5 tools, SSE streaming, SEBI compliance | ✅ Done |
 | 5 | ChromaDB RAG — Indian financial knowledge retrieval | ✅ Done |
 | 6 | RM Copilot — next actions, meeting prep, financial plan | ✅ Done |
-| 7 | Compliance dashboard — full audit log, SEBI doc generation | 🔜 Next |
-| 8 | Compliance dashboard — full audit log, SEBI doc generation | 🔜 Next |
+| 7+8 | Compliance dashboard — audit log, risk alerts, SEBI docs, AI governance | ✅ Done |
 | 9 | Frontend polish — all dashboards fully wired | 🔜 Next |
-| 10 | Demo prep | 🔜 Next |
+| 10 | Demo prep — end-to-end test, Docker clean build, LangSmith review | 🔜 Next |
 
 ---
 
@@ -186,6 +186,13 @@ Interactive docs available at **http://localhost:8000/docs** (Swagger UI) and **
 | `POST` | `/api/chat/message` | AI chat — returns SSE stream |
 | `GET` | `/api/chat/history/{clientId}` | Chat history |
 | `GET` | `/api/rm/next-actions` | Prioritised RM action queue |
+| `GET` | `/api/rm/meeting-prep/{id}` | AI-generated meeting brief |
+| `POST` | `/api/financial-plan/generate` | AI comprehensive financial plan |
+| `GET` | `/api/compliance/audit-log` | Paginated AI audit log (filters: client, tool, days) |
+| `GET` | `/api/compliance/risk-alerts` | All unresolved alerts with client names |
+| `PATCH` | `/api/compliance/resolve-alert/{id}` | Mark alert resolved |
+| `POST` | `/api/compliance/generate-doc` | SEBI document generator (5 doc types) |
+| `GET` | `/api/compliance/ai-governance` | AI governance metrics |
 | `GET` | `/health` | Health check |
 
 ### Chat SSE Protocol
@@ -271,9 +278,8 @@ This platform is built specifically for Indian investors and advisors:
 
 - Market data (`get_market_data` tool) uses static demo values — live NSE/BSE API integration planned
 - ChromaDB RAG pipeline active with 162 chunks across 5 Indian financial knowledge documents
-- RM copilot endpoints (`/api/rm/meeting-prep`, `/api/financial-plan/generate`) return stubs — full implementation in Phase 7
-- Compliance endpoints partially stubbed — full implementation in Phase 8
-- `chromadb` and `sentence-transformers` commented out in `requirements.txt` until C++ Build Tools are installed (Windows)
+- Market data (`get_market_data` tool) uses static demo values — live NSE/BSE API integration planned
+- `chromadb` and `sentence-transformers` may require C++ Build Tools on Windows (see setup notes)
 
 ---
 
@@ -291,11 +297,9 @@ The project version is maintained in three places (always kept in sync):
 | 0.3.0 | Phase 3+4 | Claude integration + 5 AI tools + SSE streaming |
 | 0.4.0 | Bugfix | Windows compatibility, dependency fixes, migration stability |
 | 0.5.0 | Phase 5 | ChromaDB RAG pipeline — 162 chunks, 5 knowledge docs |
-| 0.6.0 | Phase 6 | RM Copilot — next actions, meeting prep, financial plan |
-| 0.6.0 | Phase 6 | End-to-end live testing *(planned)* |
-| 0.7.0 | Phase 7 | RM Copilot full implementation *(planned)* |
-| 0.8.0 | Phase 8 | Compliance dashboard full implementation *(planned)* |
-| 0.9.0 | Phase 9 | Frontend polish *(planned)* |
+| 0.6.0 | Phase 7 | RM Copilot — next actions, meeting prep, financial plan |
+| 0.7.0 | Phase 8 | Compliance dashboard — audit log, risk alerts, SEBI docs, AI governance |
+| 0.8.0 | Phase 9 | Frontend polish *(planned)* |
 | 1.0.0 | Phase 10 | Demo-ready release *(planned)* |
 
 ---

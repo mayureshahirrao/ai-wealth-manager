@@ -1,0 +1,302 @@
+================================================================================
+AI WEALTH MANAGER — PROJECT ACTIVITY LOG v0.7.0
+Generated: 2026-06-01
+================================================================================
+
+SECTION 1 — Project Inception
+--------------------------------------------------------------------------------
+See: docs/project_activity_log_v0.4.0.txt (full inception detail)
+Summary: AI-powered wealth management platform for Indian market. Dual problem:
+advice accessibility gap for retail investors + advisor productivity gap for RMs.
+Three-role system: Investor self-service, RM copilot, Compliance monitoring.
+SEBI IA Regulations 2013 compliance throughout.
+
+SECTION 2 — Phases 1–4 Summary
+--------------------------------------------------------------------------------
+See: docs/project_activity_log_v0.4.0.txt
+- Phase 1 (v0.1.0): Full project scaffold — FastAPI, PostgreSQL, React 18, Docker
+- Phase 2 (v0.2.0): Financial engine — XIRR, tax calc (Budget 2024), goal engine, SIP
+- Phase 3+4 (v0.3.0): Claude integration — 5 AI tools, SSE streaming, SEBI compliance layer
+- v0.4.0 bugfix: Windows compatibility, dependency pins, migration stability
+
+SECTION 3 — Phase 5 Summary (v0.5.0)
+--------------------------------------------------------------------------------
+See: docs/project_activity_log_v0.4.0.txt (Phase 5 section)
+ChromaDB RAG pipeline: 5 knowledge documents, 162 chunks, semantic retrieval.
+Bug fix: client_id force-override in tool inputs (prevented Claude UUID hallucination).
+
+SECTION 4 — Phase 6/7 Summary (v0.6.0)
+--------------------------------------------------------------------------------
+RM Copilot full implementation:
+- GET /api/rm/next-actions: prioritised action queue (alerts + overdue + at-risk goals)
+- GET /api/rm/meeting-prep/{id}: AI meeting brief via Claude (7-section structured prompt)
+- GET /api/rm/alerts/{id}: enriched client alerts
+- POST /api/financial-plan/generate: 8-section AI financial plan, saved to compliance_documents
+- GET /api/financial-plan/{id}: retrieve saved plan
+Frontend: NextActions.jsx, FinancialPlanView.jsx, ClientDetail.jsx (4-tab with meeting prep)
+
+SECTION 5 — Phase 8: Compliance Module (v0.7.0) — FULL DETAIL
+================================================================================
+
+5.1  User Instructions (verbatim)
+--------------------------------------------------------------------------------
+[Turn 1] "Analyse this project and let me know from where we should start working"
+
+[Turn 2] "please recheck as i know from phase 7 its pending, you need to analyse it
+properly and start"
+→ Claude re-analysed all backend API files and all frontend pages to determine
+  accurate completion status vs. planned phases.
+
+[Turn 3] "/caveman-compress" on MEMORY.md → aborted (file too small, 3 lines)
+
+[Turn 4] "go with the project_phase1.md"
+→ project_phase1.md was stale; Claude updated it with accurate current state
+  instead of compressing outdated data.
+
+[Turn 5] "continue where you left"
+→ Proceeded with Phase 8 implementation: commit compliance.py + build 3 frontend pieces.
+
+[Turn 6] (tool approved) → preview_start, preview verification
+
+[Turn 7] "/phase-complete" → this log
+
+5.2  Recommendations & Decisions
+--------------------------------------------------------------------------------
+Decision: Accurate project state analysis before starting work.
+  → Initial analysis incorrectly marked Phase 7 as done (it was v0.6.0 commit).
+  → Re-analysis revealed compliance.py was fully implemented but uncommitted.
+  → Three frontend gaps identified: AIGovernanceView stub, DocGeneratorView missing,
+    RiskAlertsView showing UUID instead of client name.
+
+Decision: Update stale project_phase1.md rather than compress it.
+  → Memory was 3 days old and listed Phases 5-10 as "pending" (wrong).
+  → Accurate rewrite more valuable than compressing false data.
+
+Decision: Add DocGeneratorView as 4th nav item rather than embedding in existing view.
+  → Keeps compliance dashboard sections clean and focused.
+  → Consistent with plan: dedicated page per compliance function.
+
+Decision: Skip resolve-alert UI for now.
+  → PATCH /api/compliance/resolve-alert/{id} endpoint exists in backend.
+  → RiskAlertsView shows alerts; resolve button can be Phase 10 polish.
+  → No user request for resolve UI specifically.
+
+5.3  Actions Performed
+--------------------------------------------------------------------------------
+File: backend/app/api/compliance.py
+  Action: Full rewrite from 79-line stub to 516-line full implementation
+  - GET /api/compliance/audit-log: paginated with client_id/tool_name/sebi_compliant/days filters
+  - GET /api/compliance/risk-alerts: all unresolved alerts, filter by priority, enriched with client_name
+  - PATCH /api/compliance/resolve-alert/{id}: marks resolved, stores note + resolver email + timestamp
+  - POST /api/compliance/generate-doc: 5 doc types via Claude, saves to compliance_documents table
+  - GET /api/compliance/ai-governance: confidence stats, tool usage, daily trend, low-conf table, flags
+  - 5 prompt builders: _sebi_disclosure_prompt, _risk_profile_prompt, _suitability_prompt,
+    _kyc_record_prompt, _meeting_summary_prompt
+  Commit: 6d2582d "feat: Phase 8 — full compliance module implementation"
+
+File: frontend/src/pages/compliance/AIGovernanceView.jsx
+  Action: Full rewrite from 15-line stub "coming in Phase 8" to 200-line full implementation
+  - Period selector (7/30/90/365 days) with useQuery wired to ENDPOINTS.COMPLIANCE.AI_GOVERNANCE
+  - 4 stat cards with colour thresholds (green/amber/red)
+  - Flag banners for non-compliant / low-confidence / missing disclaimer counts
+  - Confidence distribution bars (high/medium/low/unknown)
+  - Tool usage bars sorted by frequency
+  - Mini bar chart for daily interaction trend
+  - Low-confidence table with ConfidenceBadge component
+
+File: frontend/src/pages/compliance/DocGeneratorView.jsx
+  Action: New file created (0 → 150 lines)
+  - 5 doc type options with descriptions
+  - Client selector from /api/clients
+  - Context/notes textarea
+  - useMutation wired to ENDPOINTS.COMPLIANCE.GENERATE_DOC
+  - Document display with download button
+  - Saved doc_id + audit trail confirmation
+
+File: frontend/src/pages/compliance/ComplianceDashboard.jsx
+  Action: Added 4th nav item "Doc Generator" + route for DocGeneratorView
+
+File: frontend/src/pages/compliance/RiskAlertsView.jsx
+  Action: One-line fix — client_name shown instead of client_id.slice(0,8)
+
+File: memory/project_phase1.md
+  Action: Rewrote stale content with accurate current project state
+  - Phases 5-7 now marked complete
+  - Phase 8 backend noted as done/uncommitted (now committed)
+  - Pending work accurately listed
+
+Commit: df8335a "feat: Phase 8 frontend — compliance dashboard complete"
+  4 files changed, 417 insertions(+), 9 deletions(-)
+
+5.4  Testing & Verification
+--------------------------------------------------------------------------------
+Frontend build verification:
+  - preview_start → frontend server on port 3000 (status: started, not reused)
+  - preview_console_logs level=error → "No console logs" ✅
+  - preview_screenshot → Login page renders correctly ✅
+  - Login attempt → "Network Error" (expected — Docker backend not running) ✅
+  - All 3 new JSX files compiled without errors ✅
+
+Backend not started during this session (Docker not running).
+Full end-to-end verification deferred to Phase 10.
+
+5.5  Deliverables
+--------------------------------------------------------------------------------
+Backend:
+  - 5 fully implemented compliance endpoints (was 0 working, all were stubs)
+  - SEBI document generator with 5 prompt templates
+  - AI governance metrics with confidence distribution, tool usage, daily trend
+
+Frontend:
+  - AIGovernanceView: full dashboard UI (was placeholder text)
+  - DocGeneratorView: new SEBI doc generator page
+  - ComplianceDashboard: 4-tab nav (was 3)
+  - RiskAlertsView: client name fix
+
+Documentation:
+  - VERSION: 0.6.0 → 0.7.0
+  - backend/app/core/config.py: APP_VERSION 0.6.0 → 0.7.0
+  - frontend/package.json: version 0.6.0 → 0.7.0
+  - CHANGELOG.md: v0.7.0 entry added
+  - README.md: version badge, status table, known limitations, API table, versioning table
+  - memory/project_phase1.md: rewritten with accurate state
+  - docs/project_activity_log_v0.7.0.txt: this file
+
+SECTION 6 — Artifacts Index (cumulative)
+================================================================================
+Key files ever created or significantly modified:
+
+Backend Core:
+  backend/app/main.py                         FastAPI app + router registration
+  backend/app/core/config.py                  Settings via pydantic-settings
+  backend/app/core/exceptions.py              Custom exception hierarchy
+  backend/app/core/base_response.py           Standard APIResponse wrapper
+  backend/app/core/logging_config.py          structlog JSON logging
+  backend/app/core/error_handler.py           Global exception → APIResponse
+
+Database:
+  backend/app/database/models.py              All SQLAlchemy ORM models (10 tables)
+  backend/app/database/base_model.py          Base, enums, mixins
+  backend/app/database/repository.py         Generic + specific repositories
+  backend/app/database/transaction.py        AsyncSession factory
+  backend/alembic/                           Migration scripts
+
+Auth:
+  backend/app/auth/router.py                 POST /api/auth/login, GET /api/auth/me
+  backend/app/auth/jwt_handler.py            JWT create/verify
+  backend/app/auth/role_guard.py             require_investor/rm/compliance guards
+  backend/app/auth/password_utils.py         bcrypt hash/verify
+
+Financial Engine:
+  backend/app/financial/xirr.py              XIRR calculation (Newton-Raphson)
+  backend/app/financial/tax_calculator.py    Old/New regime, LTCG (Budget 2024)
+  backend/app/financial/goal_engine.py       GoalAssessment: feasibility, shortfall, SIP gap
+  backend/app/financial/sip_calculator.py    SIP projection, retirement corpus
+  backend/app/financial/indian_constants.py  Inflation, return rates, SEBI limits
+  backend/app/financial/currency_formatter.py format_inr (Lakhs/Crores)
+
+AI Layer:
+  backend/app/ai/claude_client.py            Anthropic SDK wrapper with retry
+  backend/app/ai/streaming.py                Agentic SSE loop, RAG injection
+  backend/app/ai/base_tool.py               Abstract BaseTool
+  backend/app/ai/tool_registry.py           ToolRegistry singleton
+  backend/app/ai/compliance_injector.py     SEBI disclaimer injection
+  backend/app/ai/response_validator.py      Confidence scoring, prohibited phrases
+  backend/app/ai/langsmith_tracer.py        LangSmith tracing integration
+  backend/app/ai/tools/get_portfolio_summary.py
+  backend/app/ai/tools/get_goal_progress.py
+  backend/app/ai/tools/calculate_tax_liability.py
+  backend/app/ai/tools/get_market_data.py
+  backend/app/ai/tools/run_retirement_projection.py
+
+RAG:
+  backend/app/rag/embedder.py               ChromaDB indexing (sentence-transformers)
+  backend/app/rag/retriever.py              Semantic search, query-type-aware filtering
+  backend/app/rag/index.py                  CLI: python -m app.rag.index
+  backend/app/rag/knowledge_docs/           5 .txt knowledge files (162 chunks)
+
+API Routers:
+  backend/app/api/clients.py                GET /api/clients, /api/clients/{id}/*
+  backend/app/api/me.py                     GET /api/me/* (investor self-service)
+  backend/app/api/chat.py                   POST /api/chat/message (SSE), GET /api/chat/history
+  backend/app/api/market.py                 GET /api/market/nav
+  backend/app/api/rm.py                     GET /api/rm/next-actions, meeting-prep, alerts
+  backend/app/api/financial_plan.py         POST+GET /api/financial-plan/*
+  backend/app/api/compliance.py             5 compliance endpoints (v0.7.0)
+
+Seed:
+  backend/app/seed/seed_data.py             5 Indian personas, assets, NAV history
+
+Frontend:
+  frontend/src/main.jsx                     React 18 entry
+  frontend/src/App.jsx                      Router, AuthContext, role-based routing
+  frontend/src/api/apiClient.js             Axios instance with JWT interceptor
+  frontend/src/api/endpoints.js             All endpoint URL constants
+  frontend/src/api/errorHandler.js          Axios error normalisation
+  frontend/src/hooks/useAuth.js             AuthContext + login/logout
+  frontend/src/hooks/useApi.js              React Query hooks (all endpoints)
+  frontend/src/hooks/useSSE.js              SSE streaming hook for chat
+  frontend/src/hooks/useINRFormatter.js     INR formatting hook
+  frontend/src/utils/constants.js           Roles, colours, polling intervals
+  frontend/src/utils/formatters.js          formatDate, formatXIRR, formatINR
+  frontend/src/utils/chartHelpers.js        Recharts helpers
+  frontend/src/components/AppShell.jsx      Sidebar + role-colour nav
+  frontend/src/components/INRAmount.jsx     ₹ display component
+  frontend/src/components/PercentBadge.jsx  Coloured % badge
+  frontend/src/components/ConfidenceBadge.jsx  AI confidence colour badge
+  frontend/src/components/LoadingSpinner.jsx
+  frontend/src/components/ErrorBoundary.jsx
+  frontend/src/pages/Login.jsx              3-role quick-fill login
+  frontend/src/pages/investor/InvestorDashboard.jsx
+  frontend/src/pages/investor/PortfolioOverview.jsx
+  frontend/src/pages/investor/GoalsView.jsx
+  frontend/src/pages/investor/ChatView.jsx
+  frontend/src/pages/investor/TaxView.jsx
+  frontend/src/pages/rm/RMDashboard.jsx
+  frontend/src/pages/rm/ClientList.jsx
+  frontend/src/pages/rm/ClientDetail.jsx    4-tab: Overview/Portfolio/Goals/Meeting Prep
+  frontend/src/pages/rm/NextActions.jsx     Priority-filtered action queue
+  frontend/src/pages/rm/FinancialPlanView.jsx  AI plan generator with download
+  frontend/src/pages/compliance/ComplianceDashboard.jsx  4-tab nav
+  frontend/src/pages/compliance/AuditLogView.jsx
+  frontend/src/pages/compliance/RiskAlertsView.jsx       Fixed: shows client_name
+  frontend/src/pages/compliance/AIGovernanceView.jsx     Full implementation (v0.7.0)
+  frontend/src/pages/compliance/DocGeneratorView.jsx     New (v0.7.0)
+
+Infrastructure:
+  docker-compose.yml                         PostgreSQL 16, ChromaDB 0.5.23, backend, frontend
+  backend/Dockerfile
+  backend/requirements.txt
+  .env.example
+  VERSION                                    0.7.0
+  CHANGELOG.md
+  README.md
+  Makefile
+
+SECTION 7 — Pending Work (Phase 10)
+================================================================================
+
+Priority 1 — Backend smoke test (requires Docker):
+  [ ] docker-compose up → all services healthy
+  [ ] Run seed: python -m app.seed.seed_data → 5 personas loaded
+  [ ] Index RAG: python -m app.rag.index → 162 chunks confirmed
+  [ ] GET /health → {"status": "ok", "version": "0.7.0"}
+  [ ] POST /api/auth/login (compliance@wealthmanager.com / demo1234) → JWT issued
+
+Priority 2 — Role flow verification:
+  [ ] Investor: login → portfolio loads → goals visible → tax summary → AI chat responds
+  [ ] RM: login → client list → client detail → meeting prep generates → financial plan generates
+  [ ] Compliance: login → audit log loads → risk alerts show client names → AI governance metrics → doc generator produces SEBI doc
+
+Priority 3 — API surface check:
+  [ ] GET /docs → all endpoints documented in Swagger
+  [ ] PATCH /api/compliance/resolve-alert/{id} → alert marked resolved
+
+Priority 4 — Optional polish:
+  [ ] Add resolve button to RiskAlertsView
+  [ ] LangSmith trace review (if LANGCHAIN_API_KEY configured)
+  [ ] Docker clean build from scratch (docker system prune + docker-compose up --build)
+
+================================================================================
+END OF LOG v0.7.0
+================================================================================

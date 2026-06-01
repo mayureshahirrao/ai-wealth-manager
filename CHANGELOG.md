@@ -11,6 +11,69 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [0.7.0] — 2026-06-01
+
+### Added — Phase 8: Compliance Module Full Implementation
+
+#### `backend/app/api/compliance.py` (full rewrite of stub)
+- `GET /api/compliance/audit-log` — paginated AI audit log with filters:
+  - Filters: `client_id`, `tool_name`, `sebi_compliant`, `days` (look-back window)
+  - Enriched with client names; distinct tool list returned for filter UI
+  - Pagination metadata: page, page_size, total, total_pages
+- `GET /api/compliance/risk-alerts` — all unresolved alerts across all clients:
+  - Filter by `priority` (critical/high/medium/low)
+  - Enriched with `client_name` via join
+- `PATCH /api/compliance/resolve-alert/{id}` — mark alert resolved:
+  - Sets `is_resolved=True`, stores `resolution_note`, records `resolved_by` email and timestamp
+- `POST /api/compliance/generate-doc` — SEBI document generator via Claude:
+  - 5 doc types: `DISCLOSURE_DOC`, `RISK_PROFILE`, `SUITABILITY_ATTESTATION`, `KYC_RECORD`, `MEETING_SUMMARY`
+  - Each type has a dedicated Claude prompt builder with client data context
+  - Saves to `compliance_documents` table for audit trail
+- `GET /api/compliance/ai-governance` — AI governance metrics dashboard:
+  - SEBI compliance rate %, disclaimer injection rate %, average confidence, average duration
+  - Confidence distribution: high/medium/low/unknown buckets with counts + pct
+  - Tool usage breakdown sorted by frequency
+  - Low-confidence interactions (score < 0.50) enriched with client names
+  - Daily interaction trend (last 7 days of look-back window)
+  - Flags: non-compliant count, below-threshold count, missing disclaimer count
+- 5 prompt builder helpers: `_sebi_disclosure_prompt`, `_risk_profile_prompt`,
+  `_suitability_prompt`, `_kyc_record_prompt`, `_meeting_summary_prompt`
+
+#### `frontend/src/pages/compliance/AIGovernanceView.jsx` (full rewrite of stub)
+- Period selector (7 / 30 / 90 / 365 days) wired to `GET /api/compliance/ai-governance`
+- 4 stat cards: total interactions, SEBI compliance rate, avg confidence, disclaimer injection rate
+- Colour-coded compliance/confidence status (green ≥95%/75%, amber ≥80%/50%, red below)
+- Flag banners: non-compliant count, low-confidence count, missing disclaimer count
+- Confidence distribution: horizontal progress bars for high/medium/low/unknown
+- Tool usage: horizontal progress bars per tool name
+- Daily trend: mini bar chart (last 7 days)
+- Low-confidence table: client name, tool, query preview, ConfidenceBadge, timestamp
+
+#### `frontend/src/pages/compliance/DocGeneratorView.jsx` (new file)
+- Client selector populated from `/api/clients`
+- Doc type selector with 5 options and description per type
+- Optional context/notes textarea
+- "Generate Document" button wired to `POST /api/compliance/generate-doc`
+- Document rendered in bg-gray-50 pre block with download button
+- Shows doc_id + "saved to audit trail" confirmation
+
+#### `frontend/src/pages/compliance/ComplianceDashboard.jsx`
+- Added 4th nav item: "Doc Generator" → `/compliance/doc-generator`
+- Route added for `DocGeneratorView`
+
+#### `frontend/src/pages/compliance/RiskAlertsView.jsx`
+- Fixed: shows `client_name` (returned by API) instead of truncated `client_id` UUID
+
+### Fixed
+- RiskAlertsView showed `client_id.slice(0,8)...` — now shows `client_name` from API response
+
+### Verified Working
+- Frontend compiles with zero console errors ✅
+- Login page renders, all 3 role quick-fill buttons visible ✅
+- Network error on login expected (backend Docker not started during UI verification) ✅
+
+---
+
 ## [0.6.0] — 2026-05-31
 
 ### Added — Phase 6: RM Copilot Full Implementation

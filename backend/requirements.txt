@@ -26,9 +26,9 @@ langchain-anthropic==0.3.3
 langgraph==0.2.56
 langsmith==0.1.147
 
-# ── Vector DB / Embeddings (Phase 5 — install after C++ Build Tools) ─────────
-# chromadb==0.5.23
-# sentence-transformers==3.3.1
+# ── Vector DB / Embeddings ────────────────────────────────────────────────────
+chromadb==0.5.23
+sentence-transformers==3.3.1
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 structlog==24.4.0

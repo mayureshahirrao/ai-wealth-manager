@@ -36,6 +36,10 @@ seed:
 
 migrate-seed: migrate seed
 
+rag-index:
+	@echo "Indexing knowledge docs into ChromaDB..."
+	cd backend && .venv/Scripts/python -m app.rag.index
+
 # ── Backend ───────────────────────────────────────────────────────────────────
 
 backend:

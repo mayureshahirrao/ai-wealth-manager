@@ -1,6 +1,6 @@
 # AI Wealth Manager — India 🇮🇳
 
-> **Version 0.4.0** · [Changelog](CHANGELOG.md)
+> **Version 0.5.0** · [Changelog](CHANGELOG.md)
 
 An AI-powered robo-advisor platform for the Indian market, built with **Claude Sonnet** as the reasoning engine. Covers portfolio analysis, goal planning, tax optimisation (Budget 2024), and retirement projections — all within SEBI (Investment Advisers) Regulations, 2013 compliance.
 
@@ -54,7 +54,7 @@ An AI-powered robo-advisor platform for the Indian market, built with **Claude S
 | 1 | Foundation scaffold — DB models, auth, stub APIs, React shell | ✅ Done |
 | 2 | Financial engine — XIRR, tax calc, goal engine, data layer | ✅ Done |
 | 3+4 | Claude integration — 5 tools, SSE streaming, SEBI compliance | ✅ Done |
-| 5 | ChromaDB RAG — Indian financial knowledge retrieval | 🔜 Next |
+| 5 | ChromaDB RAG — Indian financial knowledge retrieval | ✅ Done |
 | 6 | End-to-end testing with live Anthropic API key | 🔜 Next |
 | 7 | RM Copilot — meeting prep, next actions, financial plan | 🔜 Next |
 | 8 | Compliance dashboard — full audit log, SEBI doc generation | 🔜 Next |
@@ -119,7 +119,19 @@ python -m venv .venv
 .venv/bin/python -m app.seed.seed_data
 ```
 
-### 4. Start backend server
+### 4. Index knowledge docs into ChromaDB (one-time)
+
+```bash
+# Windows:
+.venv\Scripts\python -m app.rag.index
+
+# macOS/Linux:
+.venv/bin/python -m app.rag.index
+```
+
+Expected: `✅ Indexed 162 chunks from 5 documents into ChromaDB.`
+
+### 5. Start backend server
 
 ```bash
 # Windows:
@@ -129,7 +141,7 @@ python -m venv .venv
 .venv/bin/uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 5. Start frontend (new terminal)
+### 6. Start frontend (new terminal)
 
 ```bash
 cd frontend
@@ -257,8 +269,8 @@ This platform is built specifically for Indian investors and advisors:
 
 ## Known Limitations (Current Version)
 
-- Market data (`get_market_data` tool) uses static demo values — live NSE/BSE API integration in Phase 5
-- ChromaDB RAG pipeline not yet active — knowledge retrieval in Phase 5
+- Market data (`get_market_data` tool) uses static demo values — live NSE/BSE API integration planned
+- ChromaDB RAG pipeline active with 162 chunks across 5 Indian financial knowledge documents
 - RM copilot endpoints (`/api/rm/meeting-prep`, `/api/financial-plan/generate`) return stubs — full implementation in Phase 7
 - Compliance endpoints partially stubbed — full implementation in Phase 8
 - `chromadb` and `sentence-transformers` commented out in `requirements.txt` until C++ Build Tools are installed (Windows)
@@ -278,7 +290,7 @@ The project version is maintained in three places (always kept in sync):
 | 0.2.0 | Phase 2 | Financial engine + data layer |
 | 0.3.0 | Phase 3+4 | Claude integration + 5 AI tools + SSE streaming |
 | 0.4.0 | Bugfix | Windows compatibility, dependency fixes, migration stability |
-| 0.5.0 | Phase 5 | ChromaDB RAG pipeline *(planned)* |
+| 0.5.0 | Phase 5 | ChromaDB RAG pipeline — 162 chunks, 5 knowledge docs |
 | 0.6.0 | Phase 6 | End-to-end live testing *(planned)* |
 | 0.7.0 | Phase 7 | RM Copilot full implementation *(planned)* |
 | 0.8.0 | Phase 8 | Compliance dashboard full implementation *(planned)* |

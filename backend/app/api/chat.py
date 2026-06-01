@@ -81,6 +81,7 @@ async def chat_message(
         system_prompt = build_investor_system_prompt(
             client_name=client.name,
             risk_profile=client.risk_profile.value if hasattr(client.risk_profile, "value") else str(client.risk_profile),
+            client_id=payload.client_id,
         )
     else:
         # RM and Compliance see all tools

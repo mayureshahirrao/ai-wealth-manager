@@ -11,6 +11,63 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [0.5.0] — 2026-05-31
+
+### Added — Phase 5: ChromaDB RAG Pipeline
+
+#### Knowledge Documents (`backend/app/rag/knowledge_docs/`)
+- `sebi_ia_regulations.txt` — SEBI IA Regulations 2013: registration, conduct obligations
+  (Clauses 17–24), AI advisory rules, prohibited activities, record retention requirements
+- `indian_tax_guide.txt` — Complete FY 2024-25 tax guide: Old/New regime slabs, Budget 2024
+  LTCG/STCG rates (12.5%/20%), NPS/PPF/EPF benefits, LTCG harvesting strategy, filing dates
+- `mutual_funds_guide.txt` — AMFI MF categories, SIP vs lumpsum, expense ratio impact,
+  Direct vs Regular plans, portfolio construction, XIRR explained
+- `retirement_planning_guide.txt` — Three-pillar framework, corpus calculation methodology,
+  timeline strategy by age, SWP post-retirement, healthcare planning, FIRE in India
+- `goal_based_investing.txt` — Goal types (emergency fund, child education, home, retirement,
+  wedding), feasibility scoring, SIP amounts for common goals, asset allocation by timeline
+
+#### RAG Engine (`backend/app/rag/`)
+- `embedder.py` — Loads .txt knowledge docs, chunks them (500-char chunks, 100 overlap) at
+  paragraph/sentence boundaries, embeds with sentence-transformers (all-MiniLM-L6-v2),
+  upserts into ChromaDB collection; idempotent (clears before re-indexing)
+- `retriever.py` — Semantic search using cosine similarity; query-type-aware source filtering
+  (e.g., TAX queries search only tax + SEBI docs); formats top-k chunks into system prompt
+  context string (max 3000 chars); `get_rag_context()` async convenience wrapper
+- `index.py` — CLI entry point: `python -m app.rag.index`
+- `__init__.py` — Public API: `retrieve`, `format_context_for_prompt`, `get_rag_context`,
+  `index_knowledge_docs`
+
+#### Streaming Integration (`backend/app/ai/streaming.py`)
+- RAG retrieval now runs before every Claude API call
+- `_is_rag_available()` — lazy singleton check; graceful degradation if ChromaDB unreachable
+- Retrieved context injected into enriched system prompt
+- `rag_sources` count included in `done` SSE event
+- `estimate_confidence()` now receives `rag_sources_found` for better scoring
+- **Bug fix**: `client_id` now always force-overridden in tool inputs (prevents Claude
+  hallucinating placeholder UUIDs like "priya-sharma-uuid")
+
+#### Chat Endpoint (`backend/app/api/chat.py`)
+- `build_investor_system_prompt()` now receives `client_id` parameter
+- Real UUID embedded in system prompt with explicit instruction to Claude
+
+#### System Prompt (`backend/app/ai/streaming.py`)
+- `build_investor_system_prompt()` signature updated: added `client_id: str = ""`
+- Client UUID and instruction injected into prompt: "use the client_id provided above"
+
+#### Infrastructure
+- `docker-compose.yml` — ChromaDB image: `0.5.0` → `0.5.23` (fixes API v1/v2 mismatch)
+- `Makefile` — added `rag-index` target
+- `requirements.txt` — uncommented `chromadb==0.5.23` and `sentence-transformers==3.3.1`
+
+### Verified Working
+- RAG retrieval test: scores 0.786 and 0.763 for LTCG tax query ✅
+- 162 chunks indexed from 5 documents ✅
+- Full chat pipeline: SSE streaming, 2 tools called, 3 RAG sources, confidence 0.79 ✅
+- SEBI disclaimer auto-injected ✅
+
+---
+
 ## [0.4.0] — 2026-05-29
 
 ### Fixed — Windows compatibility & dependency stabilisation

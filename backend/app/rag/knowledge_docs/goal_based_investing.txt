@@ -1,0 +1,223 @@
+TITLE: Goal-Based Investing Guide — Indian Context
+
+SOURCE: Financial planning frameworks adapted for Indian investors
+APPLICABILITY: Individual investors planning for specific life goals
+
+================================================================================
+WHAT IS GOAL-BASED INVESTING?
+================================================================================
+
+Goal-based investing means:
+- Every rupee invested is tied to a specific life goal
+- Asset allocation matches goal's time horizon and risk tolerance
+- Progress is measurable (current corpus vs required corpus)
+- Prevents emotional selling during market downturns (goal anchor)
+
+Benefits over ad-hoc investing:
+- Clarity on how much to invest each month
+- Automatic course correction when off-track
+- Avoids lifestyle inflation eating into goal savings
+- Better discipline: money earmarked for education stays for education
+
+================================================================================
+COMMON FINANCIAL GOALS — INDIAN FAMILIES
+================================================================================
+
+1. EMERGENCY FUND
+   Priority: Highest (Foundation of all financial planning)
+   Target: 6 months of living expenses in liquid/accessible form
+   Timeline: Immediate (build within 6-12 months)
+   Where to keep: Liquid mutual fund, savings account with high interest
+   Amount example: Monthly expenses ₹60,000 → Emergency fund ₹3.6 lakh
+   Note: Not an investment — a safety net. Never invest emergency fund in equity.
+
+2. CHILD'S EDUCATION
+   Priority: High (after emergency fund)
+   Timeline: 5-18 years depending on child's age
+   Target amount: Very inflation-sensitive
+   - Engineering/Medicine (tier 1 private): ₹20-40 lakh today; 15 years → ₹50-100 lakh
+   - IIM MBA: ₹25-35 lakh today; 18 years → ₹80-120 lakh
+   - Abroad education (USA, UK): ₹60-120 lakh today; 15 years → ₹1.5-3 Crore
+   Investment approach:
+   - 10+ years: 70-80% equity (flexi cap + mid cap), 20-30% debt
+   - 5-10 years: 50-60% equity, 40-50% debt (balanced hybrid)
+   - < 5 years: 30% equity max, 70% in short duration/FD
+   - Never use ULIP or endowment for child education (low returns, inflexible)
+   SIP calculation:
+   - ₹50 lakh corpus in 15 years at 12% return: ₹10,000/month SIP
+   - ₹1 crore in 15 years at 12%: ₹20,000/month SIP
+
+3. HOME PURCHASE
+   Priority: Medium (personal vs investment)
+   Timeline: 3-10 years for down payment; then EMI goal
+   Down payment: Typically 20% of property value + stamp duty + registration
+   - ₹1 Crore flat → ₹20-25 lakh down payment needed
+   - 5 years accumulation at 10%: SIP of ₹32,000/month needed
+   Investment approach:
+   - > 5 years: 50% equity + 50% debt (balanced approach)
+   - 3-5 years: Balanced hybrid or balanced advantage fund
+   - < 3 years: Short duration debt fund or FD
+   Home loan consideration:
+   - EMI should not exceed 30-35% of monthly take-home pay
+   - Total debt (home + car + personal) < 40-45% of take-home
+   - Tax benefit on home loan: 80C (₹1.5L principal, old regime) + 24B (₹2L interest, old regime)
+   - Prepay home loan aggressively in first 5-7 years (maximum interest period)
+
+4. RETIREMENT CORPUS
+   Priority: High (cannot be deferred)
+   Timeline: 15-35 years
+   Target: 25-35x annual expenses (depends on lifestyle and returns assumption)
+   See dedicated retirement planning guide for detailed calculation.
+   Investment approach: Maximum equity early; gradually shift to balance in late career.
+
+5. WEDDING FUND
+   Priority: Medium
+   Indian wedding costs: ₹10-50 lakh (varies widely)
+   Timeline: 5-15 years
+   Investment approach:
+   - > 7 years: 60% equity, 40% debt
+   - 3-7 years: Balanced advantage fund
+   - < 3 years: Short duration debt, RD, FD
+
+6. VACATION / TRAVEL
+   Priority: Lower (lifestyle goal)
+   Timeline: 1-3 years
+   Investment approach: Short duration debt fund, recurring deposit, high-yield savings
+   Annual international vacation: ₹2-5 lakh → SIP ₹15,000-40,000/month for 1 year
+
+7. VEHICLE PURCHASE
+   Priority: Low-medium (depreciating asset — minimise financing)
+   Better approach: Save first, buy with minimum loan
+   Investment: Short duration fund for 1-2 years; avoid personal loans at 12-18%
+
+================================================================================
+GOAL FEASIBILITY SCORING
+================================================================================
+
+How to assess if you are on track for a goal:
+
+Feasibility Score 90-100 (On Track):
+- Projected corpus ≥ 90% of target
+- Current SIP + existing corpus on trajectory to meet goal
+- No action needed; maintain current plan
+- Recommendation: Continue current SIP; review annually
+
+Feasibility Score 70-89 (Slightly Off Track):
+- Small gap between projected and target corpus
+- Moderate increase in SIP can close the gap
+- Action: Increase monthly SIP by calculated gap amount
+- Review in 6 months after SIP increase
+
+Feasibility Score 40-69 (Needs Action):
+- Significant shortfall; current plan insufficient
+- Options: (1) Increase SIP substantially, (2) Extend timeline, (3) Reduce target
+- Immediate action required
+- Consider step-up SIP + lumpsum if available
+
+Feasibility Score 0-39 (At Risk):
+- Goal unlikely to be met with current trajectory
+- Major restructuring needed: increase SIP 2-3x, or significantly extend timeline
+- May need to reassess goal priority or combine multiple strategies
+- Human advisor review recommended
+
+================================================================================
+ASSET ALLOCATION BY GOAL TIMELINE
+================================================================================
+
+TIMELINE > 10 YEARS:
+Asset allocation: 75-80% equity, 15-20% debt, 5% gold
+Reasoning: Long time horizon absorbs market volatility; equity maximises real returns
+Suitable instruments: Flexi cap, large+mid cap blend, ELSS, Nifty index fund
+Debt component: PPF, NPS, short-medium duration debt fund
+Rebalancing: Annual rebalancing to target allocation
+
+TIMELINE 5-10 YEARS:
+Asset allocation: 60-70% equity, 25-30% debt, 5-10% gold
+Reasoning: Still equity-heavy for growth; debt provides stability as goal approaches
+Suitable: Balanced advantage fund + large cap + short duration debt
+Rebalancing: Semi-annual or when deviation > 5%
+
+TIMELINE 3-5 YEARS:
+Asset allocation: 40-50% equity, 45-50% debt, 5% gold
+Reasoning: Approaching goal; reduce equity risk; preserve capital
+Suitable: Conservative hybrid fund, arbitrage fund, short duration, FD for stability
+Rebalancing: Quarterly; systematically shift to lower risk as goal approaches
+
+TIMELINE 1-3 YEARS:
+Asset allocation: 20-30% equity (max), 70-80% debt/liquid
+Reasoning: Capital preservation; avoid equity market risk close to goal date
+Suitable: Short duration debt fund, FD, liquid fund for 12-18 months
+Note: If using equity, ensure it is LTCG qualifying (> 12 months holding)
+
+TIMELINE < 1 YEAR:
+Asset allocation: 0-10% equity, 90-100% liquid/short-term debt
+Instruments: Liquid fund, ultra-short fund, FD, savings account
+Priority: Capital preservation; returns secondary
+
+================================================================================
+SIP AMOUNTS FOR COMMON GOALS
+================================================================================
+
+(Assuming 12% return for equity, 7% for debt, 6% inflation, 60% equity in portfolio)
+
+CHILD EDUCATION — ₹25 lakh in today's money:
+- Timeline 10 years: SIP ≈ ₹12,000/month
+- Timeline 15 years: SIP ≈ ₹6,500/month
+- Timeline 18 years: SIP ≈ ₹4,500/month (inflation-adjusted target ≈ ₹71 lakh)
+
+HOME DOWN PAYMENT — ₹20 lakh (in today's money):
+- Timeline 3 years: SIP ≈ ₹47,000/month (more lumpsum needed)
+- Timeline 5 years: SIP ≈ ₹25,000/month
+- Timeline 7 years: SIP ≈ ₹16,000/month
+
+RETIREMENT — ₹1 lakh/month in today's money, retire at 60:
+- Starting at age 25: SIP ≈ ₹18,000/month
+- Starting at age 30: SIP ≈ ₹30,000/month
+- Starting at age 35: SIP ≈ ₹52,000/month
+- Starting at age 40: SIP ≈ ₹95,000/month
+(Dramatic difference — illustrates cost of delay)
+
+WEDDING — ₹20 lakh in today's money:
+- Timeline 10 years: SIP ≈ ₹9,000/month
+- Timeline 7 years: SIP ≈ ₹15,000/month
+- Timeline 5 years: SIP ≈ ₹25,000/month
+
+================================================================================
+PRIORITISING GOALS WHEN MONEY IS LIMITED
+================================================================================
+
+Priority order for limited resources:
+1. Emergency fund (6 months expenses) — non-negotiable
+2. Term insurance premium — protect income
+3. Health insurance premium — protect against medical costs
+4. EPF contribution — mandatory if salaried; do not reduce
+5. Retirement SIP — cannot be deferred; compounding most powerful early
+6. Child education SIP — long timeline; start as soon as child is born
+7. Home down payment — plan well in advance; avoid down payment loan
+8. Short-term goals — vacation, vehicle, wedding; fund after above
+
+When under financial stress:
+- Do NOT stop retirement SIP (pause or reduce, but don't stop)
+- Do NOT withdraw EPF (huge long-term cost)
+- Stop short-term discretionary goal SIPs first
+- Maintain emergency fund at all costs
+
+================================================================================
+GOAL REVIEW AND COURSE CORRECTION
+================================================================================
+
+Annual review checklist:
+□ Has income changed? → Update SIP proportionally
+□ Has family situation changed (marriage, child, parent dependency)? → New goals
+□ Has asset allocation drifted from target? → Rebalance
+□ Are all goals on track (feasibility score)? → Increase SIP if needed
+□ Is emergency fund still adequate? → Replenish if used
+□ Has insurance coverage kept pace with liabilities? → Top up term/health
+
+Life events requiring immediate review:
+- Marriage: Combine finances; add partner goals; review insurance
+- Birth of child: Add education goal; increase life insurance
+- Job loss: Stop non-essential SIPs; protect emergency fund
+- Salary hike: Increase SIPs proportionally (lifestyle inflation trap)
+- Inheritance/bonus: Lumpsum into underperforming goals
+- Death of earning member: Life insurance claim → deploy proceeds toward goals

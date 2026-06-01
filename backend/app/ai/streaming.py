@@ -1,20 +1,23 @@
 """
-streaming.py — Agentic Claude streaming loop with tool-use.
+streaming.py — Agentic Claude streaming loop with tool-use and RAG.
 
 Implements an async generator that:
-1. Sends messages to Claude with tool schemas
-2. Handles tool_use responses (dispatches to ToolRegistry)
-3. Streams text chunks as SSE events
-4. Injects SEBI disclaimer and yields final `done` event
+1. Retrieves relevant knowledge chunks from ChromaDB (RAG)
+2. Injects knowledge context into the system prompt
+3. Sends messages to Claude with tool schemas
+4. Handles tool_use responses (dispatches to ToolRegistry)
+5. Streams text chunks as SSE events
+6. Injects SEBI disclaimer and yields final `done` event
 
 SSE Event format:
     data: {"type": "delta", "text": "..."}\n\n
     data: {"type": "tool_call", "tool": "...", "input": {...}}\n\n
     data: {"type": "tool_result", "tool": "...", "result": {...}}\n\n
-    data: {"type": "done", "confidence": 0.85, "tools_used": [...]}\n\n
+    data: {"type": "done", "confidence": 0.85, "tools_used": [...], "rag_sources": 2}\n\n
     data: {"type": "error", "message": "..."}\n\n
 
-Dependencies: claude_client, tool_registry, compliance_injector, response_validator (Tier 4)
+Dependencies: claude_client, tool_registry, compliance_injector, response_validator,
+              rag.retriever (Tier 4)
 """
 
 import json
@@ -36,6 +39,24 @@ logger = get_logger(__name__)
 
 MAX_TOOL_ITERATIONS = 5  # Safety limit on the agentic loop
 
+# Lazy import RAG to avoid startup failure if ChromaDB is unreachable
+_rag_available: bool | None = None
+
+
+def _is_rag_available() -> bool:
+    """Check once if ChromaDB is reachable. Caches result."""
+    global _rag_available
+    if _rag_available is None:
+        try:
+            from app.rag.retriever import _get_collection
+            col = _get_collection()
+            _rag_available = col.count() > 0
+            logger.info("rag_status", available=_rag_available, chunks=col.count())
+        except Exception as exc:
+            logger.warning("rag_unavailable", reason=str(exc))
+            _rag_available = False
+    return _rag_available
+
 
 def sse_event(data: dict) -> str:
     """Format a dict as an SSE event string."""
@@ -51,7 +72,7 @@ async def stream_chat_response(
     user_query: str,
 ) -> AsyncGenerator[str, None]:
     """
-    Async generator implementing the agentic Claude tool-use loop.
+    Async generator implementing the agentic Claude tool-use loop with RAG.
 
     Args:
         messages: Conversation history in Claude format
@@ -70,6 +91,28 @@ async def stream_chat_response(
     full_response_text = ""
     start_time = time.monotonic()
     iteration = 0
+    rag_sources_found = 0
+
+    # ── RAG: inject relevant knowledge context into system prompt ─────────────
+    enriched_system_prompt = system_prompt
+    if _is_rag_available():
+        try:
+            from app.rag.retriever import get_rag_context
+            rag_context, rag_sources_found = await get_rag_context(
+                user_query=user_query,
+                query_type=query_type,
+            )
+            if rag_context:
+                enriched_system_prompt = system_prompt + "\n\n" + rag_context
+                logger.debug(
+                    "rag_context_injected",
+                    sources=rag_sources_found,
+                    context_chars=len(rag_context),
+                    client_id=client_id,
+                )
+        except Exception as exc:
+            logger.warning("rag_injection_failed", error=str(exc))
+            # Continue without RAG — graceful degradation
 
     # Working copy of messages (we append tool results here)
     conversation = list(messages)
@@ -89,7 +132,7 @@ async def stream_chat_response(
             response = await claude.complete_with_tools(
                 messages=conversation,
                 tools=tool_schemas,
-                system=system_prompt,
+                system=enriched_system_prompt,
             )
 
             # --- Stream text content blocks ---
@@ -132,9 +175,9 @@ async def stream_chat_response(
                     })
 
                     try:
-                        # Always inject client_id so tools can query the DB
-                        if "client_id" not in tool_input:
-                            tool_input["client_id"] = client_id
+                        # Always override client_id with the verified real UUID
+                        # (prevents Claude hallucinating placeholder values)
+                        tool_input["client_id"] = client_id
 
                         result = await tool_registry.dispatch(tool_name, **tool_input)
 
@@ -200,13 +243,14 @@ async def stream_chat_response(
                 full_response_text = final_response
 
         compliance = validate_response_compliance(full_response_text, query_type)
-        confidence = estimate_confidence(full_response_text, tools_used)
+        confidence = estimate_confidence(full_response_text, tools_used, rag_sources_found)
 
         duration_ms = int((time.monotonic() - start_time) * 1000)
         logger.info(
             "stream_complete",
             client_id=client_id,
             tools_used=tools_used,
+            rag_sources=rag_sources_found,
             iterations=iteration,
             confidence=confidence,
             duration_ms=duration_ms,
@@ -217,6 +261,7 @@ async def stream_chat_response(
             "type": "done",
             "confidence": confidence,
             "tools_used": tools_used,
+            "rag_sources": rag_sources_found,
             "query_type": query_type,
             "compliant": compliance["is_compliant"],
             "duration_ms": duration_ms,
@@ -249,18 +294,20 @@ def _block_to_dict(block) -> dict:
         return {"type": block.type}
 
 
-def build_investor_system_prompt(client_name: str, risk_profile: str) -> str:
+def build_investor_system_prompt(client_name: str, risk_profile: str, client_id: str = "") -> str:
     """
     Build the system prompt for an investor-facing chat session.
 
     Args:
         client_name: Client's full name
         risk_profile: Risk profile string (conservative/moderate/aggressive)
+        client_id: The client's UUID (injected so Claude never needs to guess it)
 
     Returns:
         System prompt string
     """
-    return f"""You are an AI wealth management assistant for {client_name}, an investor with a {risk_profile} risk profile.
+    client_id_line = f"\nThe client's ID for all tool calls is: {client_id}" if client_id else ""
+    return f"""You are an AI wealth management assistant for {client_name}, an investor with a {risk_profile} risk profile.{client_id_line}
 
 You have access to tools that can retrieve:
 - Portfolio summary and holdings
@@ -271,12 +318,13 @@ You have access to tools that can retrieve:
 
 Guidelines:
 1. Always use tools to fetch live data before answering questions about portfolios, taxes, or goals
-2. Provide specific numbers in Indian format (₹, Lakhs, Crores)
-3. Reference Indian tax rules accurately (LTCG 12.5% above ₹1.25L, STCG 20%, Budget 2024)
-4. Do not make specific buy/sell recommendations — provide analysis and let the client decide
-5. For retirement planning, always mention the importance of inflation-adjusted targets
-6. Be concise but thorough — clients want actionable insights
-7. If a question is outside your tools' scope, say so clearly and suggest consulting their RM
+2. When calling any tool, use the client_id provided above — never guess or make up an ID
+3. Provide specific numbers in Indian format (₹, Lakhs, Crores)
+4. Reference Indian tax rules accurately (LTCG 12.5% above ₹1.25L, STCG 20%, Budget 2024)
+5. Do not make specific buy/sell recommendations — provide analysis and let the client decide
+6. For retirement planning, always mention the importance of inflation-adjusted targets
+7. Be concise but thorough — clients want actionable insights
+8. If a question is outside your tools' scope, say so clearly and suggest consulting their RM
 
 Remember: You are providing financial information, not regulated investment advice."""
 

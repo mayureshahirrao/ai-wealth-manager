@@ -1,0 +1,191 @@
+TITLE: Indian Income Tax and Capital Gains Guide — FY 2024-25 (Budget 2024)
+
+SOURCE: Income Tax Act 1961, Finance Act 2024
+APPLICABILITY: Individual taxpayers, mutual fund investors, salaried employees
+
+================================================================================
+INCOME TAX REGIMES (FY 2024-25)
+================================================================================
+
+NEW TAX REGIME (Default from FY 2023-24):
+Slab                    Rate
+Up to ₹3,00,000         Nil
+₹3,00,001 – ₹7,00,000   5%
+₹7,00,001 – ₹10,00,000  10%
+₹10,00,001 – ₹12,00,000 15%
+₹12,00,001 – ₹15,00,000 20%
+Above ₹15,00,000        30%
+
+New Regime Benefits:
+- Standard deduction: ₹75,000 (Budget 2024 increase from ₹50,000)
+- Section 87A rebate: No tax if income ≤ ₹7 lakh (after standard deduction)
+- Maximum rebate: ₹25,000
+- Effective: Zero tax up to ₹7.75 lakh (₹7L + ₹75K std deduction)
+- No deductions allowed (80C, 80D, HRA, LTA, home loan interest)
+
+OLD TAX REGIME (Optional; choose before filing ITR):
+Slab                    Rate
+Up to ₹2,50,000         Nil
+₹2,50,001 – ₹5,00,000   5%
+₹5,00,001 – ₹10,00,000  20%
+Above ₹10,00,000        30%
+
+Senior Citizens (60–79 years): Basic exemption ₹3 lakh
+Super Senior Citizens (80+ years): Basic exemption ₹5 lakh
+
+Old Regime Benefits (allowed deductions):
+- Section 80C: ₹1.5 lakh (ELSS, PPF, EPF, LIC, ULIP, NSC, home loan principal)
+- Section 80D: Health insurance (₹25K self, ₹50K if senior; ₹25K/₹50K parents)
+- Section 80CCD(1B): Additional NPS ₹50,000 (over and above 80C)
+- Section 24B: Home loan interest ₹2 lakh (self-occupied property)
+- HRA exemption: Actual HRA or 50% of salary (metro) or 40% (non-metro)
+- Standard deduction: ₹50,000
+- Section 87A rebate: No tax up to ₹5 lakh income; max rebate ₹12,500
+
+Health & Education Cess: 4% on income tax + surcharge (both regimes)
+
+Surcharge rates (income > ₹50 lakh):
+₹50L–₹1Cr: 10% | ₹1Cr–₹2Cr: 15% | ₹2Cr–₹5Cr: 25% (capped at 25% in new regime)
+Above ₹5Cr: 37% (old regime only)
+
+WHICH REGIME IS BETTER?
+- New regime: Better for income up to ₹15 lakh with few deductions
+- Old regime: Better if total deductions exceed ₹3.75 lakh (approx. breakeven)
+- Key check: If 80C (₹1.5L) + 80D (₹25K) + NPS (₹50K) + HRA + home loan > ₹4L,
+  old regime likely saves more tax
+- Salaried: Can switch regimes every year; self-employed locked once they choose
+
+================================================================================
+CAPITAL GAINS TAX — BUDGET 2024 (REVISED RATES)
+================================================================================
+
+EQUITY MUTUAL FUNDS AND LISTED STOCKS:
+
+Long-Term Capital Gains (LTCG) — held > 12 months:
+- Rate: 12.5% (increased from 10% in Budget 2024, effective July 23, 2024)
+- Annual exemption: ₹1,25,000 (increased from ₹1,00,000)
+- No indexation benefit
+- Example: ₹5 lakh LTCG → ₹5L - ₹1.25L exemption = ₹3.75L taxable → ₹46,875 tax
+
+Short-Term Capital Gains (STCG) — held ≤ 12 months:
+- Rate: 20% (increased from 15% in Budget 2024, effective July 23, 2024)
+- No exemption
+- Added to total income; taxed at STCG rate (not slab rate)
+
+DEBT MUTUAL FUNDS (post April 1, 2023):
+- All gains taxed as income (added to total income, taxed at slab rate)
+- No separate LTCG/STCG distinction
+- No indexation benefit (removed from Budget 2024)
+- Holding period does not matter — always at income slab rate
+
+GOLD ETFs AND SOVEREIGN GOLD BONDS:
+- Gold ETF: Same as debt MF — taxed as income at slab rate
+- Sovereign Gold Bonds (SGB): Gains at maturity are fully TAX-FREE
+- SGB: If sold on exchange before maturity — LTCG/STCG rules apply
+
+ELSS MUTUAL FUNDS:
+- 3-year lock-in from each SIP installment date
+- Gains after 3 years: LTCG at 12.5% above ₹1.25 lakh exemption
+- Investment up to ₹1.5 lakh: eligible for 80C deduction (old regime only)
+
+================================================================================
+LTCG TAX HARVESTING STRATEGY
+================================================================================
+
+What is LTCG Harvesting?
+- Book long-term capital gains up to ₹1,25,000 every financial year (tax-free)
+- Immediately reinvest in the same fund
+- This resets your cost basis to current NAV
+- Reduces future LTCG tax liability
+
+When to harvest:
+- Before March 31 each financial year
+- When unrealised LTCG in equity portfolio exceeds ₹1.25 lakh
+- If you haven't already realised ₹1.25 lakh LTCG this financial year
+
+Tax saved by harvesting ₹1.25 lakh LTCG:
+- ₹1,25,000 × 12.5% = ₹15,625 saved (plus cess = ~₹16,250 effective saving)
+
+Example:
+- Portfolio unrealised LTCG: ₹4 lakh
+- Harvest ₹1.25 lakh → zero tax
+- Remaining ₹2.75 lakh still in portfolio (future liability)
+- Next year: harvest another ₹1.25 lakh
+
+Caution: STT applies on redemption; factor in exit load if within lock-in.
+
+================================================================================
+NPS TAX BENEFITS
+================================================================================
+
+Section 80CCD(1): Employee contribution up to 10% of salary (within 80C limit)
+Section 80CCD(1B): Additional ₹50,000 deduction (over and above ₹1.5L 80C limit)
+Section 80CCD(2): Employer contribution up to 10% of salary — no upper limit, tax-free
+
+At Retirement (age 60):
+- 60% lump sum withdrawal: FULLY TAX-FREE
+- 40% must purchase annuity: annuity income taxed at slab rate
+
+NPS available in new regime: Only 80CCD(2) employer contribution benefit available
+NPS in old regime: All three deductions available
+
+================================================================================
+PPF (PUBLIC PROVIDENT FUND)
+================================================================================
+
+Interest rate: 7.1% p.a. (compounded annually, reviewed quarterly by government)
+Investment limits: ₹500 minimum, ₹1,50,000 maximum per financial year
+Lock-in: 15 years (extendable in 5-year blocks)
+Tax treatment: EEE (Exempt-Exempt-Exempt) — contribution, interest, maturity all tax-free
+Partial withdrawal: Allowed from year 7 onwards
+Loan facility: Available from year 3 to 6 (up to 25% of balance)
+Best for: Debt allocation with guaranteed tax-free returns; risk-averse investors
+
+================================================================================
+EPF (EMPLOYEE PROVIDENT FUND)
+================================================================================
+
+Contribution: Employee 12% + Employer 12% of basic salary
+Interest rate: 8.15% p.a. (FY 2023-24)
+Tax-free: If employee contribution ≤ ₹2.5 lakh/year; interest on excess is taxable
+Withdrawal: Tax-free after 5 continuous years of service
+Early withdrawal: Taxable + TDS applies
+
+================================================================================
+FILING AND COMPLIANCE DATES
+================================================================================
+
+ITR filing deadline (no audit): July 31
+ITR filing deadline (audit required): October 31
+Advance tax installments: June 15 (15%), September 15 (45%), December 15 (75%), March 15 (100%)
+Form 26AS: Check TDS credits before filing
+AIS (Annual Information Statement): Comprehensive income/transaction report on IT portal
+
+Capital gains reporting:
+- Schedule CG in ITR-2 or ITR-3
+- Broker provides capital gains statement (P&L)
+- Mutual fund: CAMS/KFintech provides consolidated CG statement
+- Foreign assets: Must report in Schedule FA
+
+================================================================================
+COMMON TAX-SAVING INVESTMENTS (OLD REGIME — SECTION 80C)
+================================================================================
+
+ELSS Mutual Funds:
+- Lock-in: 3 years (shortest among 80C options)
+- Returns: Market-linked (historically 12-15% CAGR)
+- Tax on maturity: LTCG at 12.5% above ₹1.25L exemption
+- Best for: Investors comfortable with equity risk wanting 80C benefit
+
+PPF: 7.1% guaranteed, 15-year lock-in, EEE — best for conservative investors
+NSC: ~7.7% p.a., 5-year lock-in, interest taxable (but qualifies for 80C reinvestment)
+5-Year Tax Saver FD: 7-7.5%, 5-year lock-in, interest fully taxable
+LIC Premium: Life insurance premium; note ULIP returns now taxable if premium > ₹2.5L
+EPF: Mandatory for salaried; employer contribution also tax-free up to limits
+Home Loan Principal: EMI principal component up to ₹1.5L (in 80C bucket)
+
+Recommended 80C strategy for salaried investor in old regime:
+- ELSS: ₹50,000–₹75,000 (growth + liquidity after 3 years)
+- EPF: Auto-deducted from salary (count towards 80C)
+- PPF: ₹50,000 (stable, EEE)
+- Adjust remaining with home loan principal or NSC

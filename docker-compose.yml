@@ -21,7 +21,7 @@ services:
 
   # ── ChromaDB ─────────────────────────────────────────────────────────────────
   chromadb:
-    image: chromadb/chroma:0.5.0
+    image: chromadb/chroma:0.5.23
     container_name: wm_chromadb
     ports:
       - "8001:8000"

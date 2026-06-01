@@ -1,0 +1,233 @@
+TITLE: Indian Mutual Funds — Complete Investor Guide
+
+SOURCE: AMFI (Association of Mutual Funds in India), SEBI Circular on MF Categorisation 2017
+APPLICABILITY: Retail and HNI mutual fund investors in India
+
+================================================================================
+WHAT ARE MUTUAL FUNDS?
+================================================================================
+
+A mutual fund pools money from many investors and invests in securities (stocks, bonds, gold,
+etc.) managed by a professional fund manager. SEBI regulates all mutual funds in India.
+AMC (Asset Management Company) manages the fund; trustees oversee the AMC.
+
+Key terms:
+- NAV (Net Asset Value): Price per unit of the fund, calculated daily after market close
+- AUM (Assets Under Management): Total money managed by the fund
+- Expense Ratio: Annual fee charged by the fund (deducted from NAV daily)
+- Exit Load: Fee charged on redemption within a specified period
+- ISIN: International Securities Identification Number — unique fund identifier
+- Folio Number: Your unique account number with each AMC
+
+Direct vs Regular Plans:
+- Direct Plan: No distributor commission; lower expense ratio (0.1%–0.5% cheaper)
+- Regular Plan: Includes distributor commission; higher expense ratio
+- Always prefer Direct Plan for long-term wealth creation
+
+Growth vs IDCW (Income Distribution cum Capital Withdrawal):
+- Growth: NAV grows; no payouts; suitable for long-term goals
+- IDCW: Periodic payouts (dividends); NAV falls by payout amount; IDCW taxable as income
+- Prefer Growth option for compounding; IDCW only for regular income needs
+
+================================================================================
+SEBI MUTUAL FUND CATEGORIES (AMFI Classification)
+================================================================================
+
+EQUITY FUNDS (60%+ in equities; LTCG/STCG apply after 12 months):
+
+Large Cap Fund:
+- Invests ≥80% in top 100 companies by market cap
+- Lower risk, stable returns; suitable for conservative-moderate investors
+- Typical returns: 10-13% CAGR over 5+ years
+- Benchmark: Nifty 50, Nifty 100
+
+Mid Cap Fund:
+- Invests ≥65% in 101st–250th companies by market cap
+- Higher volatility than large cap; higher return potential
+- Typical returns: 13-16% CAGR over 5+ years
+- Suitable for: moderate-aggressive investors with 7+ year horizon
+- Benchmark: Nifty Midcap 150
+
+Small Cap Fund:
+- Invests ≥65% in companies below 250th rank
+- Highest volatility; significant drawdowns during market downturns
+- Typical returns: 15-20% CAGR over 5+ years (but with higher risk)
+- Only for aggressive investors with 10+ year horizon
+
+Flexi Cap Fund:
+- No restriction on market cap allocation; fund manager decides
+- Diversified across large, mid, small cap based on opportunities
+- Good all-weather equity fund for most investors
+
+ELSS (Equity Linked Savings Scheme):
+- 80% in equities; 3-year lock-in per SIP installment
+- Section 80C benefit (old regime): up to ₹1.5 lakh deduction
+- LTCG taxable at 12.5% above ₹1.25 lakh annual exemption
+- Best: Mirae Asset ELSS, Axis ELSS, Quant ELSS (examples)
+
+Sectoral/Thematic Funds:
+- Concentrated in specific sectors (IT, pharma, banking, infrastructure)
+- High risk; for tactical allocation only; not for core portfolio
+- Requires active monitoring and timely exit
+
+HYBRID FUNDS (Mix of equity + debt):
+
+Balanced Advantage Fund (BAF) / Dynamic Asset Allocation:
+- Dynamically shifts between equity and debt based on market valuations
+- Lower volatility than pure equity; captures most of upside, limits downside
+- LTCG/STCG applies (treated as equity if equity > 65%)
+- Suitable for: moderate investors, first-time equity investors
+
+Aggressive Hybrid Fund:
+- 65-80% equity, 20-35% debt
+- Rebalances automatically; tax-efficient
+- Good for moderate-aggressive investors in single fund
+
+Arbitrage Fund:
+- 65%+ in equity arbitrage positions; low risk like liquid funds
+- Taxed as equity (STCG at 20% if < 12 months; LTCG 12.5% if > 12 months)
+- Better than liquid fund for high-tax bracket investors (3+ month horizon)
+
+DEBT FUNDS (Post April 2023 — taxed as income at slab rate):
+
+Liquid Fund:
+- Invests in instruments with ≤91-day maturity
+- Lowest risk; returns ~7-7.5% (close to repo rate)
+- Use for: emergency fund, parking money for 1 week to 3 months
+- Exit within 7 days: exit load applies (graded exit load)
+
+Short Duration Fund:
+- Macaulay duration 1-3 years
+- Returns ~7.5-8%; some interest rate risk
+- Use for: 1-3 year goals
+
+Corporate Bond Fund:
+- ≥80% in AAA-rated corporate bonds
+- Higher returns than gilt; some credit risk
+- Returns ~7.5-8.5%
+
+Gilt Fund:
+- 80%+ in government securities; zero credit risk
+- Interest rate sensitive (NAV falls when rates rise)
+- Use only if you understand interest rate cycles
+
+Money Market Fund:
+- 1-year maturity instruments (T-bills, CDs, CPs)
+- Slightly higher returns than liquid; suitable for 3-6 month horizon
+
+GOLD FUNDS:
+Gold ETF: Tracks gold price; stored in demat; 1 unit = 1 gram of gold
+Gold Fund of Fund: Invests in Gold ETF; no demat needed; SIP possible
+Both taxed as income at slab rate (post Budget 2024 change)
+Sovereign Gold Bond (SGB): Best for long-term gold exposure (maturity gains tax-free)
+
+================================================================================
+SIP (SYSTEMATIC INVESTMENT PLAN)
+================================================================================
+
+What is SIP:
+- Fixed amount invested at regular intervals (monthly, weekly, quarterly)
+- Rupee cost averaging: buy more units when NAV is low, fewer when NAV is high
+- Compounding: returns earned on returns over time
+- Discipline: removes need to time the market
+
+SIP vs Lumpsum:
+- SIP: Better for regular income investors; reduces timing risk; builds discipline
+- Lumpsum: Suitable when markets are undervalued or for windfall investments
+- Combination: Lumpsum in corrections + ongoing SIP
+
+Step-Up SIP:
+- Increase SIP amount by 10-15% every year (aligned with salary increments)
+- Dramatically improves corpus: ₹10,000/month SIP for 20 years at 12% = ₹91L
+- Same with 10% annual step-up = ₹1.82 Cr (2x improvement)
+
+SIP calculation formula:
+FV = P × [(1+r)^n - 1] / r × (1+r)
+Where P = monthly SIP, r = monthly return rate, n = number of months
+
+Recommended SIP allocation:
+Conservative investor: 30% large cap equity fund + 70% debt/hybrid
+Moderate investor: 60% equity (mix of large/flexi cap) + 40% debt
+Aggressive investor: 80% equity (large + mid + small cap) + 20% debt/gold
+
+================================================================================
+PORTFOLIO CONSTRUCTION PRINCIPLES
+================================================================================
+
+Core-Satellite Approach:
+- Core (70-80%): Low-cost index funds or large cap/flexi cap active funds
+- Satellite (20-30%): Mid cap, small cap, sectoral for alpha generation
+
+Asset Allocation by age:
+- Rule of thumb: Equity % = 100 - Age (e.g., 30 years old → 70% equity)
+- More nuanced: Risk tolerance, income stability, goal horizon also matter
+
+Diversification principles:
+- Equity diversification: Large (40%) + Mid (30%) + Small (20%) + International (10%)
+- Avoid holding too many funds in same category (over-diversification)
+- 5-7 funds sufficient for most investors (1-2 in each category)
+
+Rebalancing:
+- Restore target allocation at least annually or when any asset class drifts >5%
+- Use new investments to rebalance (avoid triggering capital gains)
+- December/January: good time for annual rebalancing + LTCG harvesting
+
+================================================================================
+IMPORTANT MUTUAL FUND METRICS
+================================================================================
+
+XIRR (Extended Internal Rate of Return):
+- Most accurate measure of your actual return (accounts for timing of cashflows)
+- Better than simple or absolute returns for SIP investors
+- Healthy XIRR: >12% for equity over 5+ years; >7% for debt
+
+Expense Ratio:
+- Annual cost deducted from NAV daily
+- Direct plan: 0.1-0.5% for large cap equity; 0.05-0.1% for index funds
+- Regular plan: 0.5-2% (difference goes to distributor as commission)
+- Impact: 1% extra expense over 20 years reduces corpus by ~18%
+
+Sharpe Ratio: Risk-adjusted return; higher is better; >1 is good
+Sortino Ratio: Downside risk-adjusted return; better than Sharpe for evaluating downside
+Alpha: Excess return over benchmark; positive alpha means fund beat its benchmark
+Beta: Market sensitivity; beta of 1.2 means fund moves 1.2x the index
+
+Rolling Returns vs Point-to-Point Returns:
+- Always check rolling returns (1Y, 3Y, 5Y) over multiple periods
+- Point-to-point (e.g., "5-year return as of today") depends heavily on start date
+- Consistent rolling returns indicate reliable fund management
+
+================================================================================
+KYC AND INVESTMENT PROCESS
+================================================================================
+
+KYC (Know Your Customer) — mandatory for all MF investments:
+- PAN card + address proof + photograph
+- One-time KYC valid across all AMCs (via CAMS/KFintech KYC)
+- KYC must be refreshed every 2 years (SEBI requirement)
+
+Investment modes:
+- Online: AMC website, MF Central, MFU (MF Utilities), CAMS, KFintech apps
+- Demat: Through broker (Zerodha, Groww, etc.); ISIN-based holdings
+- NACH/e-NACH: Auto-debit mandate for SIP
+
+Nomination:
+- Mandatory for all MF folios from January 2023 (or opt-out affirmatively)
+- Add nominee to avoid delay in estate settlement
+
+Redemption:
+- T+2 for equity funds (credit to bank account in 2 business days)
+- T+1 for debt/liquid funds
+- Exit load: typically 1% if redeemed within 1 year for equity funds
+
+================================================================================
+COMMON MISTAKES TO AVOID
+================================================================================
+
+1. Chasing past returns: Last year's top fund is often next year's laggard
+2. Too many funds: More than 7-8 funds creates redundancy without diversification
+3. Stopping SIP during market falls: This is when SIP works best (buying more units cheap)
+4. Ignoring expense ratio: 2% regular plan vs 0.5% direct plan is significant over 20 years
+5. Mixing insurance and investment: Avoid ULIPs and endowment plans; buy term insurance separately
+6. Redeeming prematurely: Equity funds need 5-7 years to deliver meaningful returns
+7. Not reviewing annually: Rebalance and review fund performance once a year

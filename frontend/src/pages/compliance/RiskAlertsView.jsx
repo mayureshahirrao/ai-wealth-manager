@@ -36,7 +36,7 @@ export default function RiskAlertsView() {
                     <span className="text-xs text-gray-500">{a.alert_type?.replace('_', ' ')}</span>
                   </div>
                   <p className="text-sm text-gray-900">{a.message}</p>
-                  <p className="text-xs text-gray-400 mt-1">Client: {a.client_id?.slice(0, 8)}... · {formatDate(a.created_at)}</p>
+                  <p className="text-xs text-gray-400 mt-1">Client: {a.client_name || a.client_id?.slice(0, 8)} · {formatDate(a.created_at)}</p>
                 </div>
               </div>
             </div>

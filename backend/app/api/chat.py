@@ -6,13 +6,14 @@ Implements the full agentic Claude loop with:
 - SEBI compliance (disclaimer injection, query classification)
 - ChatMessage + AIAuditLog persistence after each response
 - Role-based tool selection (investor vs RM)
+- Rate limiting: 10 AI chat requests per minute per IP
 """
 
 import json
 import time
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -32,6 +33,7 @@ from app.ai.streaming import (
 )
 from app.ai.compliance_injector import classify_query, estimate_confidence
 from app.core.logging_config import get_logger
+from app.main import limiter
 
 logger = get_logger(__name__)
 
@@ -45,7 +47,9 @@ class ChatRequest(BaseModel):
 
 
 @router.post("/message")
+@limiter.limit("10/minute")
 async def chat_message(
+    request: Request,
     payload: ChatRequest,
     current_user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

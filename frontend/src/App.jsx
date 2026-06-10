@@ -34,7 +34,7 @@ function RoleRouter() {
 export default function App() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <ErrorBoundary>
+      <ErrorBoundary fullPage>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
 
@@ -42,7 +42,9 @@ export default function App() {
             path="/investor/*"
             element={
               <PrivateRoute allowedRoles={['investor']}>
-                <InvestorDashboard />
+                <ErrorBoundary fullPage>
+                  <InvestorDashboard />
+                </ErrorBoundary>
               </PrivateRoute>
             }
           />
@@ -51,7 +53,9 @@ export default function App() {
             path="/rm/*"
             element={
               <PrivateRoute allowedRoles={['rm']}>
-                <RMDashboard />
+                <ErrorBoundary fullPage>
+                  <RMDashboard />
+                </ErrorBoundary>
               </PrivateRoute>
             }
           />
@@ -60,7 +64,9 @@ export default function App() {
             path="/compliance/*"
             element={
               <PrivateRoute allowedRoles={['compliance']}>
-                <ComplianceDashboard />
+                <ErrorBoundary fullPage>
+                  <ComplianceDashboard />
+                </ErrorBoundary>
               </PrivateRoute>
             }
           />

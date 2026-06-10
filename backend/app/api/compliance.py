@@ -13,7 +13,7 @@ import uuid
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, Query, HTTPException, Request
 from pydantic import BaseModel, Field
 from sqlalchemy import select, func, and_, desc
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,6 +26,7 @@ from app.database.models import AIAuditLog, Alert, Client, ComplianceDocument
 from app.database.base_model import AlertPriority, ComplianceDocType
 from app.database.transaction import get_db
 from app.ai.claude_client import get_claude_client
+from app.main import limiter
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/api/compliance", tags=["compliance"])
@@ -231,7 +232,9 @@ class GenerateDocRequest(BaseModel):
 
 
 @router.post("/generate-doc")
+@limiter.limit("5/minute")
 async def generate_compliance_doc(
+    request: Request,
     payload: GenerateDocRequest,
     db: AsyncSession = Depends(get_db),
     current_user: CurrentUser = Depends(require_compliance),

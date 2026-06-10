@@ -11,7 +11,7 @@ import uuid
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -25,6 +25,7 @@ from app.database.transaction import get_db
 from app.financial.goal_engine import GoalAssessment
 from app.financial.currency_formatter import format_inr
 from app.ai.claude_client import get_claude_client
+from app.main import limiter
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/api/rm", tags=["rm"])
@@ -187,7 +188,9 @@ def _get_recommended_action(alert_type) -> str:
 # ─── Meeting Prep ─────────────────────────────────────────────────────────────
 
 @router.get("/meeting-prep/{client_id}")
+@limiter.limit("5/minute")
 async def get_meeting_prep(
+    request: Request,
     client_id: str,
     db: AsyncSession = Depends(get_db),
     current_user: CurrentUser = Depends(require_rm_or_compliance),

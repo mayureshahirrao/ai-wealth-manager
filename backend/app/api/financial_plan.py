@@ -9,7 +9,7 @@ Implements:
 import uuid
 from datetime import datetime, timezone, date
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,6 +25,7 @@ from app.financial.tax_calculator import compare_tax_regimes
 from app.financial.currency_formatter import format_inr
 from app.ai.claude_client import get_claude_client
 from app.database.transaction import get_db
+from app.main import limiter
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/api/financial-plan", tags=["financial-plan"])
@@ -42,7 +43,9 @@ class GeneratePlanRequest(BaseModel):
 # ─── Generate Financial Plan ──────────────────────────────────────────────────
 
 @router.post("/generate")
+@limiter.limit("3/minute")
 async def generate_financial_plan(
+    request: Request,
     payload: GeneratePlanRequest,
     db: AsyncSession = Depends(get_db),
     current_user: CurrentUser = Depends(require_rm),

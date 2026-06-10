@@ -1,6 +1,6 @@
 # AI Wealth Manager — India 🇮🇳
 
-> **Version 0.8.0** · [Changelog](CHANGELOG.md)
+> **Version 0.9.0** · [Changelog](CHANGELOG.md)
 
 An AI-powered robo-advisor platform for the Indian market, built with **Claude Sonnet** as the reasoning engine. Covers portfolio analysis, goal planning, tax optimisation (Budget 2024), and retirement projections — all within SEBI (Investment Advisers) Regulations, 2013 compliance.
 
@@ -59,6 +59,7 @@ An AI-powered robo-advisor platform for the Indian market, built with **Claude S
 | 6 | RM Copilot — next actions, meeting prep, financial plan | ✅ Done |
 | 7+8 | Compliance dashboard — audit log, risk alerts, SEBI docs, AI governance | ✅ Done |
 | 9+10 | Polish + Demo Prep — end-to-end test, bug fixes, developer docs | ✅ Done |
+| 11 | Production hardening — live market data, rate limiting, test suite, error boundaries | ✅ Done |
 
 ---
 
@@ -242,8 +243,31 @@ curl http://localhost:8000/health
 
 Expected:
 ```json
-{"status": "ok", "version": "0.8.0", "environment": "development"}
+{"status": "ok", "version": "0.9.0", "environment": "development"}
 ```
+
+---
+
+## Running Tests
+
+The backend test suite uses **pytest + pytest-asyncio** with an in-memory SQLite database — no running PostgreSQL or ChromaDB required.
+
+```bash
+cd backend
+
+# Windows:
+.venv\Scripts\pytest
+
+# macOS/Linux:
+.venv/bin/pytest
+```
+
+Expected:
+```
+30 passed in ~10s
+```
+
+Tests cover: health check, auth (login/roles), portfolio endpoints, compliance access control, and live market data module (with fallback mock).
 
 ---
 
@@ -380,7 +404,8 @@ The project version is maintained in three places (always kept in sync):
 | 0.7.0 | Phase 8 | Compliance dashboard — audit log, risk alerts, SEBI docs, AI governance |
 | 0.7.1 | Bugfix | Goals view broken + AI chat SSE error (cp1252 + empty API key) |
 | 0.8.0 | Phase 9+10 | Polish + Demo Prep — end-to-end fixes, developer docs, all 3 role flows verified |
-| 1.0.0 | Phase 11 | Production hardening — live market data, LangSmith review *(planned)* |
+| 0.9.0 | Phase 11 | Production hardening — live market data (yfinance), rate limiting, 30 pytest tests, error boundaries |
+| 1.0.0 | Phase 12 | Release — LangSmith review, Docker clean-build, production deployment guide *(planned)* |
 
 ---
 

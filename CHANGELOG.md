@@ -11,6 +11,68 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [0.9.0] — 2026-06-10
+
+### Added — Phase 11: Production Hardening
+
+#### `backend/app/ai/market_data.py` [NEW]
+- Live Indian market data module via Yahoo Finance (yfinance)
+- Fetches: Nifty 50, Sensex, Midcap 100, Smallcap 100, India VIX, GOLDBEES (gold ETF), USD/INR
+- 15-minute in-memory TTL cache — prevents hammering Yahoo Finance on every AI call
+- Runs fetch in executor so async event loop is never blocked
+- Graceful fallback: on yfinance error, returns stale cache or hardcoded demo values
+- Market sentiment heuristic based on daily return + VIX level
+
+#### `backend/app/ai/tools/get_market_data.py`
+- Replaced static demo dict with `await get_market_data()` call to live module
+- Tool description updated to mention live data + 15-min cache
+
+#### `backend/app/main.py`
+- Added `slowapi` rate limiter (default 300/min) with `SlowAPIMiddleware`
+- Shared `limiter` instance exported for use in routers
+
+#### `backend/app/api/chat.py`
+- `POST /api/chat/message` — `@limiter.limit("10/minute")` guard added
+
+#### `backend/app/api/rm.py`
+- `GET /api/rm/meeting-prep/{id}` — `@limiter.limit("5/minute")` guard added
+
+#### `backend/app/api/compliance.py`
+- `POST /api/compliance/generate-doc` — `@limiter.limit("5/minute")` guard added
+
+#### `backend/app/api/financial_plan.py`
+- `POST /api/financial-plan/generate` — `@limiter.limit("3/minute")` guard added
+
+#### `backend/tests/` [NEW] — pytest test suite (30 tests, all passing)
+- `tests/conftest.py` — pytest-asyncio fixtures: in-memory SQLite engine, per-test session, httpx AsyncClient, JWT auth headers for all 3 roles; JSONB→JSON SQLite patch
+- `tests/api/test_health.py` — 4 tests: /health OK, version format, /docs accessible, 404
+- `tests/api/test_auth.py` — 8 tests: login success/fail/missing, /api/auth/me for all 3 roles, auth required
+- `tests/api/test_portfolio.py` — 6 tests: portfolio data, auth required, RM forbidden from /me, goals, tax summary
+- `tests/api/test_compliance.py` — 6 tests: audit log access (investor forbidden, RM allowed, compliance allowed), risk alerts, AI governance
+- `tests/api/test_market_data.py` — 6 tests: module keys, NIFTY_50 present, index filter, fallback on error, cache TTL, debt rates
+- `backend/pytest.ini` — asyncio_mode=auto, asyncio_default_fixture_loop_scope=function
+
+#### `frontend/src/components/ErrorBoundary.jsx`
+- Added `fullPage` prop — full-viewport centered error UI for top-level boundary
+- Added `errorInfo` state to capture component stack
+- Dev-only stack trace `<details>` block (collapsed)
+- Added "Reload Page" button alongside "Try Again"
+
+#### `frontend/src/App.jsx`
+- Root `<ErrorBoundary>` upgraded to `fullPage`
+- Per-dashboard `<ErrorBoundary fullPage>` added around InvestorDashboard, RMDashboard, ComplianceDashboard — crash in one role's dashboard doesn't crash others
+
+### Added — Dependencies
+- `backend/requirements.txt`: `yfinance==1.4.1`, `slowapi==0.1.9`, `aiosqlite==0.20.0`
+
+### Verified Working ✅
+- 30 pytest tests pass (health, auth, portfolio, compliance, market data)
+- Live market data: Nifty 50 23,215, Sensex 73,983, India VIX 15.6 (2026-06-10)
+- Rate limiting: slowapi middleware wired, AI endpoints protected
+- Error boundaries: fullPage boundaries on root + all 3 role dashboards
+
+---
+
 ## [0.8.0] — 2026-06-10
 
 ### Added — Phase 10: Polish, Demo Prep & Developer Documentation

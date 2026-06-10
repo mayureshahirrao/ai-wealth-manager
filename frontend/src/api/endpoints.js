@@ -60,6 +60,7 @@ export const ENDPOINTS = {
   COMPLIANCE: {
     AUDIT_LOG:        '/api/compliance/audit-log',
     RISK_ALERTS:      '/api/compliance/risk-alerts',
+    RESOLVE_ALERT:    (alertId) => `/api/compliance/resolve-alert/${alertId}`,
     GENERATE_DOC:     '/api/compliance/generate-doc',
     AI_GOVERNANCE:    '/api/compliance/ai-governance',
   },

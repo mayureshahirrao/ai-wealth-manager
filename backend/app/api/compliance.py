@@ -275,7 +275,7 @@ async def generate_compliance_doc(
     response = await claude.complete(
         messages=[{"role": "user", "content": prompt}],
         system="You are a compliance officer at a SEBI-registered Investment Advisory firm. Generate formal, compliant documentation following SEBI IA Regulations 2013.",
-        max_tokens=1500,
+        max_tokens=800,
         temperature=0.1,
     )
 
@@ -441,7 +441,7 @@ Follow SEBI IA Regulations 2013 Clause 21 format. Date: {datetime.now().strftime
 
 def _risk_profile_prompt(client, context: str) -> str:
     return f"""Generate a formal Risk Profile Assessment Document for:
-Client: {client.name} | Age: {client.age} | Annual Income: ₹{client.annual_income:,.0f if client.annual_income else 0}
+Client: {client.name} | Age: {client.age} | Annual Income: ₹{client.annual_income or 0:,.0f}
 Risk Profile Assessed: {client.risk_profile.value if hasattr(client.risk_profile, 'value') else client.risk_profile}
 Tax Regime: {client.tax_regime.value if hasattr(client.tax_regime, 'value') else client.tax_regime}
 {f'Notes: {context}' if context else ''}

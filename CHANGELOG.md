@@ -11,6 +11,61 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [0.8.0] — 2026-06-10
+
+### Added — Phase 10: Polish, Demo Prep & Developer Documentation
+
+#### `docs/DEVELOPER_GUIDE.docx`
+- New: full developer reference — architecture, all modules, code examples, DB models, AI layer, RAG pipeline, frontend hooks, auth roles, tool extension guide, known issues, versioning
+
+#### `docs/DEMO_SCRIPT.docx`
+- New: 10-minute demo walkthrough script — 3 acts (Investor/RM/Compliance), pre-demo checklist, talking points, Q&A, timing guide, fallback troubleshooting
+
+#### `docs/RUNNING_THE_PROJECT.docx`
+- New: step-by-step ops guide — prerequisites, env setup, Docker, migrations, seed, RAG index, backend/frontend startup, service verification commands
+
+#### `README.md`
+- Added "Verify Services Are Running" section with PostgreSQL + ChromaDB + backend health check commands
+- Fixed ChromaDB collection name in verify commands (`indian_financial_knowledge`)
+- Version badge updated to 0.8.0
+
+### Fixed
+
+#### `backend/app/api/compliance.py`
+- `_risk_profile_prompt`: invalid Python f-string format spec `{client.annual_income:,.0f if client.annual_income else 0}` → fixed to `{client.annual_income or 0:,.0f}` — was causing 500 on all compliance doc generation
+- `doc_type` max_tokens reduced 1500→800 — prevents 30s axios timeout on doc generation
+
+#### `backend/app/api/rm.py`
+- Meeting prep `max_tokens` reduced 1500→800 — prevents 30s axios timeout
+
+#### `frontend/src/api/endpoints.js`
+- Added `RESOLVE_ALERT: (alertId) => /api/compliance/resolve-alert/${alertId}` — was missing entirely
+
+#### `frontend/src/hooks/useApi.js`
+- Added `useResolveAlert()` mutation — wires PATCH /api/compliance/resolve-alert/{id} with cache invalidation
+- `useGenerateMeetingPrep`: timeout increased 30s→120s — was silently timing out
+- `useGenerateComplianceDoc`: timeout increased 30s→120s — was silently timing out
+
+#### `frontend/src/pages/compliance/DocGeneratorView.jsx`
+- All 5 `DOC_TYPES` values fixed to match backend `ComplianceDocType` enum: `DISCLOSURE_DOC`→`sebi_disclosure`, `RISK_PROFILE`→`risk_profile`, etc. — mismatch was causing 400 on every doc generation attempt
+
+#### `frontend/src/pages/rm/ClientDetail.jsx`
+- Added `error: briefError` destructuring from `useGenerateMeetingPrep` — errors were silently swallowed; now shows red error card with message
+
+#### `frontend/src/pages/rm/NextActions.jsx`
+- Added `useResolveAlert` import and hook
+- Added `dismissedIds` local state for optimistic UI
+- Added `handleResolve()` — calls PATCH for alert-backed items, local-only dismiss for auto-detected items (no alert_id)
+- Added "✓ Dismiss" button on every action card
+
+### Verified Working ✅
+- Investor portal: portfolio loads, AI chat streams, goals and tax views correct
+- RM: client list, next actions display, dismiss button resolves alerts, meeting prep generates brief
+- Compliance: audit log, risk alerts, AI governance all load; doc generator produces SEBI documents for all 5 doc types
+- 31 API endpoints documented in Swagger UI at /docs
+
+---
+
 ## [0.7.1] — 2026-06-01
 
 ### Fixed — Phase 10: Critical Bug Fixes (Demo Prep)

@@ -247,7 +247,7 @@ Be concise — this is a briefing document, not a report."""
 
     response = await claude.complete(
         messages=[{"role": "user", "content": prompt}],
-        max_tokens=1500,
+        max_tokens=800,
         temperature=0.2,
     )
 

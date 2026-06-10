@@ -24,6 +24,7 @@ export default function ClientDetail() {
     mutate: generateBrief,
     isPending: generatingBrief,
     data: briefData,
+    error: briefError,
   } = useGenerateMeetingPrep(id);
 
   if (loadingClient) return <LoadingSpinner size="page" />;
@@ -263,7 +264,14 @@ export default function ClientDetail() {
             </div>
           )}
 
-          {!brief && !generatingBrief && (
+          {briefError && !generatingBrief && (
+            <div className="card border border-red-200 bg-red-50 text-red-700 p-4 text-sm">
+              <p className="font-semibold">Failed to generate brief</p>
+              <p className="mt-1 text-xs">{briefError.message}</p>
+            </div>
+          )}
+
+          {!brief && !generatingBrief && !briefError && (
             <div className="card text-center py-12">
               <p className="text-4xl mb-3">🤝</p>
               <p className="text-gray-600 font-medium">No brief generated yet</p>

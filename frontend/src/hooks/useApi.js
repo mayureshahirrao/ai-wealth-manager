@@ -257,7 +257,7 @@ export function useGenerateFinancialPlan() {
 export function useGenerateMeetingPrep(clientId) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => apiClient.get(ENDPOINTS.RM.MEETING_PREP(clientId)),
+    mutationFn: () => apiClient.get(ENDPOINTS.RM.MEETING_PREP(clientId), { timeout: 120_000 }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.meetingPrep(clientId) });
     },
@@ -282,9 +282,20 @@ export function useRiskAlerts() {
   });
 }
 
+export function useResolveAlert() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (alertId) => apiClient.patch(ENDPOINTS.COMPLIANCE.RESOLVE_ALERT(alertId)),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.riskAlerts() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.nextActions() });
+    },
+  });
+}
+
 export function useGenerateComplianceDoc() {
   return useMutation({
-    mutationFn: (payload) => apiClient.post(ENDPOINTS.COMPLIANCE.GENERATE_DOC, payload),
+    mutationFn: (payload) => apiClient.post(ENDPOINTS.COMPLIANCE.GENERATE_DOC, payload, { timeout: 120_000 }),
   });
 }
 

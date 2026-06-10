@@ -3,16 +3,16 @@ import { useClients, useGenerateComplianceDoc } from '../../hooks/useApi.js';
 import LoadingSpinner from '../../components/LoadingSpinner.jsx';
 
 const DOC_TYPES = [
-  { value: 'DISCLOSURE_DOC',        label: 'Disclosure Document',     desc: 'SEBI IA Reg. Clause 21 — adviser disclosure' },
-  { value: 'RISK_PROFILE',          label: 'Risk Profile Assessment', desc: 'Client risk questionnaire and profile determination' },
-  { value: 'SUITABILITY_ATTESTATION', label: 'Suitability Attestation', desc: 'SEBI Clause 19 — rationale for recommendations' },
-  { value: 'KYC_RECORD',            label: 'KYC Record Summary',      desc: 'PMLA + SEBI KYC compliance record' },
-  { value: 'MEETING_SUMMARY',       label: 'Meeting Summary',         desc: 'Post-meeting record with action items' },
+  { value: 'sebi_disclosure',        label: 'Disclosure Document',     desc: 'SEBI IA Reg. Clause 21 — adviser disclosure' },
+  { value: 'risk_profile',           label: 'Risk Profile Assessment', desc: 'Client risk questionnaire and profile determination' },
+  { value: 'suitability_attestation', label: 'Suitability Attestation', desc: 'SEBI Clause 19 — rationale for recommendations' },
+  { value: 'kyc_record',             label: 'KYC Record Summary',      desc: 'PMLA + SEBI KYC compliance record' },
+  { value: 'meeting_summary',        label: 'Meeting Summary',         desc: 'Post-meeting record with action items' },
 ];
 
 export default function DocGeneratorView() {
   const [clientId, setClientId] = useState('');
-  const [docType, setDocType] = useState('DISCLOSURE_DOC');
+  const [docType, setDocType] = useState('sebi_disclosure');
   const [context, setContext] = useState('');
   const [generatedDoc, setGeneratedDoc] = useState(null);
 

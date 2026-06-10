@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useNextActions } from '../../hooks/useApi.js';
+import { useNextActions, useResolveAlert } from '../../hooks/useApi.js';
 import LoadingSpinner from '../../components/LoadingSpinner.jsx';
 
 const PRIORITY_STYLES = {
@@ -25,8 +25,10 @@ const ACTION_ICONS = {
 
 export default function NextActions() {
   const { data, isLoading, error, refetch } = useNextActions();
+  const { mutate: resolveAlert, isPending: resolving } = useResolveAlert();
   const navigate = useNavigate();
   const [filterPriority, setFilterPriority] = useState('all');
+  const [dismissedIds, setDismissedIds] = useState(new Set());
 
   if (isLoading) return <LoadingSpinner size="page" label="Loading action queue..." />;
   if (error) return (
@@ -37,7 +39,19 @@ export default function NextActions() {
   );
 
   const result = data?.data || {};
-  const allActions = result.actions || [];
+  const allActions = (result.actions || []).filter(a => !dismissedIds.has(a.alert_id || `${a.client_id}-${a.action_type}`));
+
+  const handleResolve = (action) => {
+    const key = action.alert_id || `${action.client_id}-${action.action_type}`;
+    if (action.alert_id) {
+      resolveAlert(action.alert_id, {
+        onSuccess: () => setDismissedIds(prev => new Set([...prev, key])),
+      });
+    } else {
+      // Auto-detected actions (no DB alert) — dismiss locally only
+      setDismissedIds(prev => new Set([...prev, key]));
+    }
+  };
 
   const filtered = filterPriority === 'all'
     ? allActions
@@ -127,12 +141,21 @@ export default function NextActions() {
                     )}
                   </div>
                 </div>
-                <button
-                  onClick={() => navigate(`/rm/clients/${action.client_id}`)}
-                  className="shrink-0 text-xs font-medium text-blue-700 hover:underline whitespace-nowrap"
-                >
-                  View Client →
-                </button>
+                <div className="flex flex-col gap-1 shrink-0">
+                  <button
+                    onClick={() => navigate(`/rm/clients/${action.client_id}`)}
+                    className="text-xs font-medium text-blue-700 hover:underline whitespace-nowrap"
+                  >
+                    View Client →
+                  </button>
+                  <button
+                    onClick={() => handleResolve(action)}
+                    disabled={resolving}
+                    className="text-xs font-medium text-gray-400 hover:text-green-600 whitespace-nowrap disabled:opacity-50"
+                  >
+                    ✓ Dismiss
+                  </button>
+                </div>
               </div>
             </div>
           ))}

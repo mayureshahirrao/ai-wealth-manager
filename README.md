@@ -1,6 +1,6 @@
 # AI Wealth Manager — India 🇮🇳
 
-> **Version 0.7.1** · [Changelog](CHANGELOG.md)
+> **Version 0.8.0** · [Changelog](CHANGELOG.md)
 
 An AI-powered robo-advisor platform for the Indian market, built with **Claude Sonnet** as the reasoning engine. Covers portfolio analysis, goal planning, tax optimisation (Budget 2024), and retirement projections — all within SEBI (Investment Advisers) Regulations, 2013 compliance.
 
@@ -58,8 +58,7 @@ An AI-powered robo-advisor platform for the Indian market, built with **Claude S
 | 5 | ChromaDB RAG — Indian financial knowledge retrieval | ✅ Done |
 | 6 | RM Copilot — next actions, meeting prep, financial plan | ✅ Done |
 | 7+8 | Compliance dashboard — audit log, risk alerts, SEBI docs, AI governance | ✅ Done |
-| 9 | Frontend polish — all dashboards fully wired | 🔜 Next |
-| 10 | Demo prep — end-to-end test, Docker clean build, LangSmith review | 🔜 Next |
+| 9+10 | Polish + Demo Prep — end-to-end test, bug fixes, developer docs | ✅ Done |
 
 ---
 
@@ -164,6 +163,87 @@ All accounts use password: **`demo1234`**
 | Investor | `sunita.rao@demo.com` | Own portfolio, goals, chat |
 | RM | `rm@wealthmanager.com` | All 5 clients, AI copilot |
 | Compliance | `compliance@wealthmanager.com` | Audit logs, risk alerts |
+
+---
+
+## Verify Services Are Running
+
+### PostgreSQL — container health + data check
+
+```bash
+# 1. Check container status (both should show "healthy")
+docker compose ps
+
+# 2. Count seeded rows
+docker compose exec postgres psql -U wm_user -d wealth_manager -c "\dt"
+
+# 3. Verify clients exist (should return 5 rows)
+docker compose exec postgres psql -U wm_user -d wealth_manager -c "SELECT name, email FROM clients;"
+
+# 4. Verify users exist (should return 3 rows)
+docker compose exec postgres psql -U wm_user -d wealth_manager -c "SELECT email, role FROM users;"
+
+# 5. Verify holdings exist
+docker compose exec postgres psql -U wm_user -d wealth_manager -c "SELECT COUNT(*) AS holding_count FROM holdings;"
+```
+
+Expected output for clients query:
+```
+         name          |             email
+-----------------------+-------------------------------
+ Priya Sharma          | priya.sharma@demo.com
+ Arjun Kapoor          | arjun.kapoor@demo.com
+ Sunita Rao            | sunita.rao@demo.com
+ Rajesh Gupta          | rajesh.gupta@demo.com
+ Aarav Shah            | aarav.shah@demo.com
+(5 rows)
+```
+
+If 0 rows → run `make seed` (or `cd backend && .venv\Scripts\python -m app.seed.seed_data`)
+
+---
+
+### ChromaDB — container health + collection check
+
+```bash
+# 1. Heartbeat check
+curl http://localhost:8001/api/v1/heartbeat
+
+# 2. List collections (should show "indian_financial_knowledge")
+curl http://localhost:8001/api/v1/collections
+
+# 3. Get the "id" from step 2, then count chunks (should be ~162)
+curl http://localhost:8001/api/v1/collections/<id-from-step-2>/count
+```
+
+Expected:
+```json
+# Heartbeat
+{"nanosecond heartbeat": 1234567890}
+
+# Collections
+[{"name":"indian_financial_knowledge","id":"47474d58-...","metadata":{"hnsw:space":"cosine"}}]
+
+# Count
+162
+```
+
+If collection missing or count = 0 → run `make rag-index` (or `cd backend && .venv\Scripts\python -m app.rag.index`)
+
+> **Windows note:** If `curl` is unavailable, open these URLs directly in your browser.
+
+---
+
+### Backend health check
+
+```bash
+curl http://localhost:8000/health
+```
+
+Expected:
+```json
+{"status": "ok", "version": "0.8.0", "environment": "development"}
+```
 
 ---
 
@@ -278,7 +358,6 @@ This platform is built specifically for Indian investors and advisors:
 
 - Market data (`get_market_data` tool) uses static demo values — live NSE/BSE API integration planned
 - ChromaDB RAG pipeline active with 162 chunks across 5 Indian financial knowledge documents
-- Market data (`get_market_data` tool) uses static demo values — live NSE/BSE API integration planned
 - `chromadb` and `sentence-transformers` may require C++ Build Tools on Windows (see setup notes)
 
 ---
@@ -300,8 +379,8 @@ The project version is maintained in three places (always kept in sync):
 | 0.6.0 | Phase 7 | RM Copilot — next actions, meeting prep, financial plan |
 | 0.7.0 | Phase 8 | Compliance dashboard — audit log, risk alerts, SEBI docs, AI governance |
 | 0.7.1 | Bugfix | Goals view broken + AI chat SSE error (cp1252 + empty API key) |
-| 0.8.0 | Phase 9 | Frontend polish *(planned)* |
-| 1.0.0 | Phase 10 | Demo-ready release *(planned)* |
+| 0.8.0 | Phase 9+10 | Polish + Demo Prep — end-to-end fixes, developer docs, all 3 role flows verified |
+| 1.0.0 | Phase 11 | Production hardening — live market data, LangSmith review *(planned)* |
 
 ---
 
